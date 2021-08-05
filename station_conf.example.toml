@@ -1,0 +1,17 @@
+dropcontract = "0xD55CF61f31E9407Ed5a31836E1E5ea26db7Bc17b" 
+dropisopen = true 
+ethapi = "https://ropsten.infura.io/v3/" 
+listenaddr = ":8082" 
+logfilepath = "" 
+rethstatapi = "https://rtoken-api.stafi.io/stafi/v1/webapi/reth/stakestat" 
+syncstartdate = "20210716" 
+taskticker = 10000 # seconds
+
+mode = "release" # debug or release
+
+[db]
+host = "127.0.0.1" # mysql host ip
+name = "minicat1115" # the database this server used
+port = "3306" 
+pwd = "123456" # mysql password
+user = "root" # mysql username

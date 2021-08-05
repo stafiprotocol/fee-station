@@ -1,0 +1,119 @@
+# Copyright 2021 stafiprotocol
+# SPDX-License-Identifier: LGPL-3.0-only
+
+basePath: /api
+definitions:
+  user_handlers.Drop:
+    properties:
+      drop_amount:
+        type: string
+      user_address:
+        type: string
+    type: object
+  user_handlers.DropInfo:
+    properties:
+      claimed_drop_amount:
+        type: string
+      total_drop_amount:
+        type: string
+      total_reth_amount:
+        type: string
+      user_address:
+        type: string
+    type: object
+  user_handlers.RspDropInfo:
+    properties:
+      drop_info:
+        $ref: '#/definitions/user_handlers.DropInfo'
+    type: object
+  user_handlers.RspDropList:
+    properties:
+      drop_list:
+        items:
+          $ref: '#/definitions/user_handlers.Drop'
+        type: array
+    type: object
+  user_handlers.RspDropRate:
+    properties:
+      drop_rate:
+        type: string
+    type: object
+  utils.Rsp:
+    properties:
+      data:
+        type: object
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+host: xxxxx:8081
+info:
+  contact:
+    email: tpkeeper.me@gmail.com
+    name: tk
+  description: drop api document.
+  title: drop API
+  version: "1.0"
+paths:
+  /v1/drop_info:
+    get:
+      description: get user drop info
+      parameters:
+      - description: user address
+        in: query
+        name: user_address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Rsp'
+            - properties:
+                data:
+                  $ref: '#/definitions/user_handlers.RspDropInfo'
+              type: object
+      summary: get user drop info
+      tags:
+      - v1
+  /v1/drop_list:
+    get:
+      description: get drop list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Rsp'
+            - properties:
+                data:
+                  $ref: '#/definitions/user_handlers.RspDropList'
+              type: object
+      summary: get drop list
+      tags:
+      - v1
+  /v1/drop_rate:
+    get:
+      description: get drop rate
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Rsp'
+            - properties:
+                data:
+                  $ref: '#/definitions/user_handlers.RspDropRate'
+              type: object
+      summary: get drop rate
+      tags:
+      - v1
+swagger: "2.0"

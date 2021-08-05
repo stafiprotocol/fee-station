@@ -1,0 +1,192 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "drop api document.",
+        "title": "drop API",
+        "contact": {
+            "name": "tk",
+            "email": "tpkeeper.me@gmail.com"
+        },
+        "version": "1.0"
+    },
+    "host": "xxxxx:8081",
+    "basePath": "/api",
+    "paths": {
+        "/v1/drop_info": {
+            "get": {
+                "description": "get user drop info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v1"
+                ],
+                "summary": "get user drop info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user address",
+                        "name": "user_address",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Rsp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/user_handlers.RspDropInfo"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/drop_list": {
+            "get": {
+                "description": "get drop list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v1"
+                ],
+                "summary": "get drop list",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Rsp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/user_handlers.RspDropList"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/drop_rate": {
+            "get": {
+                "description": "get drop rate",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v1"
+                ],
+                "summary": "get drop rate",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Rsp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/user_handlers.RspDropRate"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "user_handlers.Drop": {
+            "type": "object",
+            "properties": {
+                "drop_amount": {
+                    "type": "string"
+                },
+                "user_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "user_handlers.DropInfo": {
+            "type": "object",
+            "properties": {
+                "claimed_drop_amount": {
+                    "type": "string"
+                },
+                "total_drop_amount": {
+                    "type": "string"
+                },
+                "total_reth_amount": {
+                    "type": "string"
+                },
+                "user_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "user_handlers.RspDropInfo": {
+            "type": "object",
+            "properties": {
+                "drop_info": {
+                    "$ref": "#/definitions/user_handlers.DropInfo"
+                }
+            }
+        },
+        "user_handlers.RspDropList": {
+            "type": "object",
+            "properties": {
+                "drop_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/user_handlers.Drop"
+                    }
+                }
+            }
+        },
+        "user_handlers.RspDropRate": {
+            "type": "object",
+            "properties": {
+                "drop_rate": {
+                    "type": "string"
+                }
+            }
+        },
+        "utils.Rsp": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}

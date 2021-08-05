@@ -1,0 +1,10 @@
+chainid = 3 
+dropcontract = "0xD55CF61f31E9407Ed5a31836E1E5ea26db7Bc17b" 
+droptime = 600 # seconds
+ethapi = "https://ropsten.infura.io/v3/" 
+from = "0x0000" 
+keystorepath = "" 
+ledgerapi = "http://localhost:8082" 
+logfilepath = "" 
+maxgasprice = 30 #GWEI
+taskticker = 600 # seconds
