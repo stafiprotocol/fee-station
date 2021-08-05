@@ -135,3 +135,21 @@ func GetDropRate(startDayStr, nowDayStr string) (string, error) {
 	}
 	return "", fmt.Errorf("switchDay err:%d", switchDay)
 }
+
+const (
+	SymbolDot  = "DOT"
+	SymbolKsm  = "KSM"
+	SymbolAtom = "ATOM"
+	SymbolEth  = "ETH"
+)
+
+var symbolMap = map[string]bool{
+	SymbolDot:  true,
+	SymbolKsm:  true,
+	SymbolAtom: true,
+	SymbolEth:  true,
+}
+
+func SymbolValid(symbol string) bool {
+	return symbolMap[symbol]
+}
