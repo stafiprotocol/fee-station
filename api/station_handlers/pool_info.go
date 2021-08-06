@@ -21,7 +21,7 @@ type RspPoolInfo struct {
 // @Tags v1
 // @Produce json
 // @Success 200 {object} utils.Rsp{data=RspPoolInfo}
-// @Router /v1/station/pool_info [get]
+// @Router /v1/station/poolInfo [get]
 func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 	list, err := dao_station.GetPoolAddressList(h.db)
 	if err != nil {

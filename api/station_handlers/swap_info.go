@@ -29,7 +29,7 @@ type ReqSwapInfo struct {
 // @Produce json
 // @Param param body ReqSwapInfo true "user swap info"
 // @Success 200 {object} utils.Rsp{data=RspPoolInfo}
-// @Router /v1/station/swap_info [post]
+// @Router /v1/station/swapInfo [post]
 func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	req := ReqSwapInfo{}
 	err := c.Bind(&req)

@@ -1,6 +1,6 @@
 # api doc
 
-## 1.post swap info
+## 1. post swap info
 
 ### (1) description
 
@@ -35,7 +35,7 @@
 
 ### (5) response
 * include status、data、message fields
-* status、message must be string format,data must be object
+* status、message must be string format, data must be object
 
 | grade 1 | grade 2 | grade 3 | type   | must exist? | encode type | description |
 | :------ | :------ | :------ | :----- | :---------- | :---------- | :---------- |
@@ -44,3 +44,33 @@
 | data    | N/A     | N/A     | object | Yes         | null        | data        |
           
           
+## 2. get pool info
+
+### (1) description
+
+*  get pool info
+
+### (2) path
+
+* /feeStation/api/v1/station/poolInfo
+
+### (3) request method
+
+* get
+
+### (4) request payload 
+
+* null
+ 
+### (5) response
+* include status、data、message fields
+* status、message must be string format,data must be object
+
+| grade 1 | grade 2      | grade 3     | type   | must exist? | encode type | description      |
+| :------ | :----------- | :---------- | :----- | :---------- | :---------- | :--------------- |
+| status  | N/A          | N/A         | string | Yes         | null        | status code      |
+| message | N/A          | N/A         | string | Yes         | null        | status info      |
+| data    | N/A          | N/A         | object | Yes         | null        | data             |
+|         | poolInfoList | N/A         | list   | Yes         | null        | list             |
+|         |              | symbol      | string | Yes         | null        | DOT KSM ATOM ETH |
+|         |              | poolAddress | string | Yes         | null        | pool address     |
