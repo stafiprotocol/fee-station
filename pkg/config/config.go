@@ -12,23 +12,24 @@ import (
 )
 
 type Config struct {
-	TaskTicker    int64 //seconds task interval
-	EthApi        string
-	REthStatApi   string
-	LedgerApi     string
-	MaxGasPrice   int64 //Gwei
-	ChainId       int64
-	DropContract  string
-	DropTime      int64 //seconds from utc+8 00:00
-	SyncStartDate string
-	From          string
-	KeystorePath  string
-	DropIsOpen    bool
-
 	ListenAddr  string
+	TaskTicker  int64  //seconds task interval
 	Mode        string //release debug test
-	Db          Db
 	LogFilePath string
+	// payer
+	StationEndpoint string
+	KeystorePath    string
+	//station
+	SwapRate string //decimal 18
+	Db       Db
+	Endpoint Endpoint
+}
+
+type Endpoint struct {
+	Eth  string
+	Atom string
+	Dot  string
+	Ksm  string
 }
 
 type Db struct {

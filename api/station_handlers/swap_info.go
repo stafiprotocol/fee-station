@@ -116,13 +116,13 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 		}
 	}
 
-	swapInfo.StafiAddress = req.StafiAddress
+	swapInfo.StafiAddress = strings.ToLower(req.StafiAddress)
 	swapInfo.Symbol = req.Symbol
 	swapInfo.Blockhash = strings.ToLower(req.Blockhash)
 	swapInfo.Txhash = strings.ToLower(req.Txhash)
 	swapInfo.PoolAddress = req.PoolAddress
-	swapInfo.Signature = req.Signature
-	swapInfo.Pubkey = req.Pubkey
+	swapInfo.Signature = strings.ToLower(req.Signature)
+	swapInfo.Pubkey = strings.ToLower(req.Pubkey)
 	swapInfo.InAmount = req.InAmount
 	swapInfo.MinOutAmount = req.MinOutAmount
 

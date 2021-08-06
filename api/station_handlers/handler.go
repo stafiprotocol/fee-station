@@ -8,9 +8,10 @@ import (
 )
 
 type Handler struct {
-	db *db.WrapDb
+	db    *db.WrapDb
+	cache map[string]string
 }
 
-func NewHandler(db *db.WrapDb) *Handler {
+func NewHandler(db *db.WrapDb, cache map[string]string) *Handler {
 	return &Handler{db: db}
 }

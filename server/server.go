@@ -18,33 +18,22 @@ type Server struct {
 	listenAddr string
 	httpServer *http.Server
 	taskTicker int64
-
-	ethApi        string
-	rEthStatApi   string
-	dropContract  string
-	dropTime      int64
-	chainId       int64
-	syncStartDate string
-	dropIsOpen    bool
-	db            *db.WrapDb
+	swapRate   string //decimal 18
+	endPoint   config.Endpoint
+	db         *db.WrapDb
 }
 
 func NewServer(cfg *config.Config, dao *db.WrapDb) (*Server, error) {
 	s := &Server{
-		listenAddr:    cfg.ListenAddr,
-		taskTicker:    cfg.TaskTicker,
-		ethApi:        cfg.EthApi,
-		rEthStatApi:   cfg.REthStatApi,
-		dropContract:  cfg.DropContract,
-		dropTime:      cfg.DropTime,
-		syncStartDate: cfg.SyncStartDate,
-		dropIsOpen:    cfg.DropIsOpen,
-
-		chainId: cfg.ChainId,
-		db:      dao,
+		listenAddr: cfg.ListenAddr,
+		taskTicker: cfg.TaskTicker,
+		swapRate:   cfg.SwapRate,
+		endPoint:   cfg.Endpoint,
+		db:         dao,
 	}
 
-	handler := s.InitHandler()
+	handler := s.InitHandler(map[string]string{
+		utils.SwapRateKey: s.swapRate})
 
 	s.httpServer = &http.Server{
 		Addr:         s.listenAddr,
@@ -56,8 +45,8 @@ func NewServer(cfg *config.Config, dao *db.WrapDb) (*Server, error) {
 	return s, nil
 }
 
-func (svr *Server) InitHandler() http.Handler {
-	return api.InitRouters(svr.db)
+func (svr *Server) InitHandler(cache map[string]string) http.Handler {
+	return api.InitRouters(svr.db, cache)
 }
 
 func (svr *Server) ApiServer() {
