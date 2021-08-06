@@ -4,8 +4,9 @@ go 1.15
 
 require (
 	github.com/BurntSushi/toml v0.3.1
+	github.com/ChainSafe/go-schnorrkel v0.0.0-20210713215043-76165a18546d
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/btcsuite/btcd v0.21.0-beta // indirect
+	github.com/btcsuite/btcd v0.22.0-beta
 	github.com/ethereum/go-ethereum v1.10.5
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
 	github.com/gin-gonic/gin v1.6.3

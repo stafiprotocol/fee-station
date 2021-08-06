@@ -11,15 +11,15 @@ import (
 )
 
 type ReqSwapInfo struct {
-	StafiAddress string `json:"stafi_address"` //base58 address
+	StafiAddress string `json:"stafiAddress"`
 	Symbol       string `json:"symbol"`
-	Blockhash    string `json:"block_hash"`
-	Txhash       string `json:"tx_hash"`
-	PoolAddress  string `json:"pool_address"`
+	Blockhash    string `json:"blockHash"`
+	Txhash       string `json:"txHash"`
+	PoolAddress  string `json:"poolAddress"`
 	Signature    string `json:"signature"`
 	Pubkey       string `json:"pubkey"`
-	InAmount     string `json:"in_amount"`
-	MinOutAmount string `json:"min_out_amount"`
+	InAmount     string `json:"inAmount"`
+	MinOutAmount string `json:"minOutAmount"`
 }
 
 // @Summary post swap info

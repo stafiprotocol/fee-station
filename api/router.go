@@ -23,8 +23,8 @@ func InitRouters(db *db.WrapDb) http.Handler {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	stationHandler := station_handlers.NewHandler(db)
-	router.GET("/fee_station/api/v1/station/pool_info", stationHandler.HandleGetPoolInfo)
-	router.POST("/fee_station/api/v1/station/swap_info", stationHandler.HandlePostSwapInfo)
+	router.GET("/feeStation/api/v1/station/poolInfo", stationHandler.HandleGetPoolInfo)
+	router.POST("/feeStation/api/v1/station/swapInfo", stationHandler.HandlePostSwapInfo)
 
 	return router
 }

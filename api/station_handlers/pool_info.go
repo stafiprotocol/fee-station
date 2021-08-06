@@ -9,11 +9,11 @@ import (
 
 type PoolInfo struct {
 	Symbol      string `json:"symbol"`
-	PoolAddress string `json:"pool_address"`
+	PoolAddress string `json:"poolAddress"`
 }
 
 type RspPoolInfo struct {
-	PoolInfoList []PoolInfo `json:"pool_info_list"`
+	PoolInfoList []PoolInfo `json:"poolInfoList"`
 }
 
 // @Summary get pool info
