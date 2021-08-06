@@ -66,7 +66,7 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 		utils.Err(c, "signature format err")
 		return
 	}
-	if pubkeyBytes, err = hexutil.Decode(req.Pubkey); req.Symbol != utils.SymbolAtom && err != nil {
+	if pubkeyBytes, err = hexutil.Decode(req.Pubkey); err != nil {
 		utils.Err(c, "pubkey format err")
 		return
 	}

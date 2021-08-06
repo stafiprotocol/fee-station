@@ -19,6 +19,7 @@ type Server struct {
 	httpServer *http.Server
 	taskTicker int64
 	swapRate   string //decimal 18
+	atomDenom  string
 	endPoint   config.Endpoint
 	db         *db.WrapDb
 }
@@ -28,6 +29,7 @@ func NewServer(cfg *config.Config, dao *db.WrapDb) (*Server, error) {
 		listenAddr: cfg.ListenAddr,
 		taskTicker: cfg.TaskTicker,
 		swapRate:   cfg.SwapRate,
+		atomDenom:  cfg.AtomDenom,
 		endPoint:   cfg.Endpoint,
 		db:         dao,
 	}

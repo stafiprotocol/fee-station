@@ -1,37 +1,9 @@
-// Copyright 2020 tpkeeper
-// SPDX-License-Identifier: LGPL-3.0-only
-
 package utils
 
-import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-)
-
+// 0 verify sigs 1 verify tx ok 2 verify tx failed 3 swap ok
 const (
-	MaxPageSize     = 50
-	DefaultPageSize = 10
+	SwapStateVerifySigs     = uint8(0)
+	SwapStateVerifyTxOk     = uint8(1)
+	SwapStateVerifyTxFailed = uint8(2)
+	SwapStatePayOk          = uint8(3)
 )
-
-type Rsp struct {
-	Status  int64       `json:"status"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
-}
-
-func Ok(c *gin.Context, msg string, data interface{}) {
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "80000",
-		"message": msg,
-		"data":    data,
-	})
-}
-
-func Err(c *gin.Context, msg string) {
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "80001",
-		"message": msg,
-		"data":    struct{}{},
-	})
-}

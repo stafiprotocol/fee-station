@@ -4,6 +4,8 @@
 package server
 
 import (
+	"fee-station/task"
+	"github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -13,7 +15,12 @@ func (svr *Server) Task() {
 	for {
 		select {
 		case <-ticker.C:
-
+			logrus.Infof("task CheckAtomTx start -----------")
+			err := task.CheckAtomTx(svr.db, svr.atomDenom, svr.endPoint.Atom)
+			if err != nil {
+				logrus.Errorf("task.CheckAtomTx err %s", err)
+			}
+			logrus.Infof("task CheckAtomTx end -----------")
 		}
 
 	}
