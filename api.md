@@ -28,7 +28,7 @@
 | poolAddress  | string | pool address, get from api                    |
 | signature    | string | signature, hex string with 0x prefix          |
 | pubkey       | string | pubkey, hex string with 0x prefix             |
-| inAmount     | string | int token amount, decimal string              |
+| inAmount     | string | in token amount, decimal string               |
 | minOutAmount | string | min out amount, decimal string                |
 
 
