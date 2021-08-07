@@ -1,0 +1,18 @@
+atomDenom = "stake" 
+dotTypesPath = "" 
+ksmTypesPath = "" 
+logFilePath = "" 
+taskTicker = 10 # seconds
+
+[endpoint]
+atom = ""
+dot = ""
+eth = ""
+ksm = ""
+
+[db]
+host = "127.0.0.1" # mysql host ip
+name = "station" # the database this server used
+port = "3306" 
+pwd = "123456" # mysql password
+user = "root" # mysql username

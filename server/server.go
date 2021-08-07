@@ -113,7 +113,6 @@ func (svr *Server) Start() error {
 		return err
 	}
 	utils.SafeGoWithRestart(svr.ApiServer)
-	utils.SafeGoWithRestart(svr.Task)
 	return nil
 }
 

@@ -9,6 +9,7 @@ get:
 build:
 	@echo "  >  \033[32mBuilding binary...\033[0m "
 	cd cmd/stationd && env GOARCH=amd64 go build -o ../../build/stationd
+	cd cmd/checkerd && env GOARCH=amd64 go build -o ../../build/checkerd
 
 ## license: Adds license header to missing files.
 license:
@@ -18,7 +19,7 @@ license:
 
 swagger:
 	@echo "  >  \033[32mBuilding swagger docs...\033[0m "
-	cd cmd/drop && swag init --parseDependency
+	cd cmd/stationd && swag init --parseDependency
 	
 
 clean:

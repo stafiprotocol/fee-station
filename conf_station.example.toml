@@ -1,21 +1,14 @@
-atomDenom = "stake" 
-dotTypesPath = "" 
-ksmTypesPath = "" 
 listenAddr = ":8083" 
 logFilePath = "" 
 mode = "release" # debug or release
 swapRate = "1000000" #decimals 6
-taskTicker = 10 # seconds
+
 [poolAddress]
 atom = "cosmos1yrdmg324z7lrrr3y0ruczuh459n9l6vgdn8tkn"
 dot = "33e2iTrJ3HDJz3wpdcfa6ooipT6xfMCvpLxkpFaJwkyCvRGM"
 eth = "0x99c85bb64564d9ef9a99621301f22c9993cb89e3"
 ksm = "33e2iTrJ3HDJz3wpdcfa6ooipT6xfMCvpLxkpFaJwkyCvRGM"
-[endpoint]
-atom = ""
-dot = ""
-eth = ""
-ksm = ""
+
 [db]
 host = "127.0.0.1" # mysql host ip
 name = "station" # the database this server used

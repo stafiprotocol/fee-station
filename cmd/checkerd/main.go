@@ -4,26 +4,26 @@
 package main
 
 import (
-	_ "fee-station/cmd/stationd/docs"
-	"fee-station/dao/migrate"
 	"fee-station/pkg/config"
 	"fee-station/pkg/db"
 	"fee-station/pkg/log"
 	"fee-station/server"
+	"fee-station/task"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"os"
 	"runtime"
 	"runtime/debug"
+
+	"github.com/sirupsen/logrus"
 )
 
 func _main() error {
-	cfg, err := config.Load("conf_station.toml")
+	cfg, err := config.Load("conf_checker.toml")
 	if err != nil {
 		fmt.Printf("loadConfig err: %s", err)
 		return err
 	}
-	log.InitLogFile(cfg.LogFilePath+"/station")
+	log.InitLogFile(cfg.LogFilePath + "/checker")
 	logrus.Infof("config info:%+v ", cfg)
 
 	//init db
@@ -42,7 +42,6 @@ func _main() error {
 
 	//interrupt signal
 	ctx := server.ShutdownListener()
-
 	defer func() {
 		sqlDb, err := db.DB.DB()
 		if err != nil {
@@ -52,41 +51,21 @@ func _main() error {
 		logrus.Infof("shutting down the db ...")
 		sqlDb.Close()
 	}()
-
-	err = migrate.AutoMigrate(db)
+	t := task.NewTask(cfg, db)
+	err = t.Start()
 	if err != nil {
-		logrus.Errorf("dao autoMigrate err: %s", err)
-		return err
-	}
-	//server
-	server, err := server.NewServer(cfg, db)
-	if err != nil {
-		logrus.Errorf("new server err: %s", err)
-		return err
-	}
-	err = server.Start()
-	if err != nil {
-		logrus.Errorf("server start err: %s", err)
+		logrus.Errorf("task start err: %s", err)
 		return err
 	}
 	defer func() {
-		logrus.Infof("shutting down server ...")
-		server.Stop()
+		logrus.Infof("shutting down task ...")
+		t.Stop()
 	}()
 
 	<-ctx.Done()
 	return nil
 }
 
-// @title drop API
-// @version 1.0
-// @description drop api document.
-
-// @contact.name tk
-// @contact.email tpkeeper.me@gmail.com
-
-// @host localhost:8083
-// @BasePath /fee_station/api
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	debug.SetGCPercent(40)
