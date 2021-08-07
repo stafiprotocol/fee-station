@@ -1,17 +1,22 @@
-dropcontract = "0xD55CF61f31E9407Ed5a31836E1E5ea26db7Bc17b" 
-dropisopen = true 
-ethapi = "https://ropsten.infura.io/v3/" 
+atomdenom = "stake" 
 listenaddr = ":8082" 
 logfilepath = "" 
-rethstatapi = "https://rtoken-api.stafi.io/stafi/v1/webapi/reth/stakestat" 
-syncstartdate = "20210716" 
-taskticker = 10000 # seconds
-
 mode = "release" # debug or release
-
+swaprate = "1000000000000000000" 
+taskticker = 10000 # seconds
+[pooladdress]
+atom = "cosmos1yrdmg324z7lrrr3y0ruczuh459n9l6vgdn8tkn "
+dot = "33e2iTrJ3HDJz3wpdcfa6ooipT6xfMCvpLxkpFaJwkyCvRGM"
+eth = "0x99c85bb64564d9ef9a99621301f22c9993cb89e3"
+ksm = "33e2iTrJ3HDJz3wpdcfa6ooipT6xfMCvpLxkpFaJwkyCvRGM"
+[endpoint]
+atom = ""
+dot = ""
+eth = ""
+ksm = ""
 [db]
 host = "127.0.0.1" # mysql host ip
-name = "minicat1115" # the database this server used
+name = "station" # the database this server used
 port = "3306" 
 pwd = "123456" # mysql password
 user = "root" # mysql username

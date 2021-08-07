@@ -20,10 +20,18 @@ type Config struct {
 	StationEndpoint string
 	KeystorePath    string
 	//station
-	AtomDenom string
-	SwapRate  string //decimal 18
-	Db        Db
-	Endpoint  Endpoint
+	AtomDenom   string
+	SwapRate    string //decimal 18
+	PoolAddress PoolAddress
+	Db          Db
+	Endpoint    Endpoint
+}
+
+type PoolAddress struct {
+	Eth  string
+	Atom string
+	Dot  string
+	Ksm  string
 }
 
 type Endpoint struct {

@@ -5,6 +5,7 @@ package server
 
 import (
 	"fee-station/api"
+	dao_station "fee-station/dao/station"
 	"fee-station/pkg/config"
 	"fee-station/pkg/db"
 	"fee-station/pkg/utils"
@@ -15,23 +16,25 @@ import (
 )
 
 type Server struct {
-	listenAddr string
-	httpServer *http.Server
-	taskTicker int64
-	swapRate   string //decimal 18
-	atomDenom  string
-	endPoint   config.Endpoint
-	db         *db.WrapDb
+	listenAddr  string
+	httpServer  *http.Server
+	taskTicker  int64
+	swapRate    string //decimal 18
+	atomDenom   string
+	poolAddress config.PoolAddress
+	endPoint    config.Endpoint
+	db          *db.WrapDb
 }
 
 func NewServer(cfg *config.Config, dao *db.WrapDb) (*Server, error) {
 	s := &Server{
-		listenAddr: cfg.ListenAddr,
-		taskTicker: cfg.TaskTicker,
-		swapRate:   cfg.SwapRate,
-		atomDenom:  cfg.AtomDenom,
-		endPoint:   cfg.Endpoint,
-		db:         dao,
+		listenAddr:  cfg.ListenAddr,
+		taskTicker:  cfg.TaskTicker,
+		swapRate:    cfg.SwapRate,
+		atomDenom:   cfg.AtomDenom,
+		poolAddress: cfg.PoolAddress,
+		endPoint:    cfg.Endpoint,
+		db:          dao,
 	}
 
 	handler := s.InitHandler(map[string]string{
@@ -63,12 +66,44 @@ func (svr *Server) ApiServer() {
 }
 
 //check and init dropFlowLatestDate LedgerLatestDate
-func (svr *Server) InitOrUpdateMetaData() error {
+func (svr *Server) InitOrUpdatePoolAddress() error {
+
+	atom, _ := dao_station.GetPoolAddressBySymbol(svr.db, utils.SymbolAtom)
+	atom.Symbol = utils.SymbolAtom
+	atom.PoolAddress = svr.poolAddress.Atom
+	err := dao_station.UpOrInPoolAddress(svr.db, atom)
+	if err != nil {
+		return err
+	}
+	eth, _ := dao_station.GetPoolAddressBySymbol(svr.db, utils.SymbolEth)
+	eth.Symbol = utils.SymbolEth
+	eth.PoolAddress = svr.poolAddress.Eth
+	err = dao_station.UpOrInPoolAddress(svr.db, eth)
+	if err != nil {
+		return err
+	}
+
+	dot, _ := dao_station.GetPoolAddressBySymbol(svr.db, utils.SymbolDot)
+	dot.Symbol = utils.SymbolDot
+	dot.PoolAddress = svr.poolAddress.Dot
+	err = dao_station.UpOrInPoolAddress(svr.db, dot)
+	if err != nil {
+		return err
+	}
+
+	ksm, _ := dao_station.GetPoolAddressBySymbol(svr.db, utils.SymbolKsm)
+	ksm.Symbol = utils.SymbolKsm
+	ksm.PoolAddress = svr.poolAddress.Ksm
+	err = dao_station.UpOrInPoolAddress(svr.db, ksm)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (svr *Server) Start() error {
-	err := svr.InitOrUpdateMetaData()
+	err := svr.InitOrUpdatePoolAddress()
 	if err != nil {
 		return err
 	}
