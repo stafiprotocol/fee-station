@@ -30,7 +30,7 @@ type ReqSwapInfo struct {
 // @Accept json
 // @Produce json
 // @Param param body ReqSwapInfo true "user swap info"
-// @Success 200 {object} utils.Rsp{data=RspPoolInfo}
+// @Success 200 {object} utils.Rsp{}
 // @Router /v1/station/swapInfo [post]
 func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	req := ReqSwapInfo{}
@@ -135,4 +135,46 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	}
 
 	utils.Ok(c, "success", struct{}{})
+}
+
+type RspSwapInfo struct {
+	SwapStatus uint8 `json:"swapStatus"`
+}
+
+// @Summary get swap info
+// @Description get swap info
+// @Tags v1
+// @Param symbol query string true "token symbol"
+// @Param blockHash query string true "block hash hex string"
+// @Param txHash query string true "tx hash hex string"
+// @Produce json
+// @Success 200 {object} utils.Rsp{data=RspSwapInfo}
+// @Router /v1/station/swapInfo [get]
+func (h *Handler) HandleGetSwapInfo(c *gin.Context) {
+	symbol := c.Query("symbol")
+	blockHash := c.Query("blockHash")
+	txHash := c.Query("txHash")
+	//check param
+	if !utils.SymbolValid(symbol) {
+		utils.Err(c, "symbol unsupport")
+		return
+	}
+	if _, err := hexutil.Decode(blockHash); err != nil {
+		utils.Err(c, "blockHash format err")
+		return
+	}
+	if _, err := hexutil.Decode(txHash); err != nil {
+		utils.Err(c, "txHash format err")
+		return
+	}
+
+	swapInfo, err := dao_station.GetSwapInfoBySymbolBlkTx(h.db, symbol, strings.ToLower(blockHash), strings.ToLower(txHash))
+	if err != nil {
+		utils.Err(c, err.Error())
+		return
+	}
+	rsp := RspSwapInfo{
+		SwapStatus: swapInfo.State,
+	}
+	utils.Ok(c, "success", rsp)
 }

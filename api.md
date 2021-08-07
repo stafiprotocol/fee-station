@@ -75,3 +75,52 @@
 |         |              | symbol      | string | Yes         | null        | DOT KSM ATOM ETH |
 |         |              | poolAddress | string | Yes         | null        | pool address     |
 |         |              | swapRate    | string | Yes         | null        | decimals 18      |
+
+
+## 3. get swap info
+
+### (1) description
+
+*  get swap info
+
+### (2) path
+
+* /feeStation/api/v1/station/swapInfo
+
+### (3) request method
+
+* get
+
+### (4) request param 
+
+* `symbol`: support `DOT KSM ATOM ETH`
+* `blockHash`: hex string with 0x prefix
+* `txHash`: hex string with 0x prefix
+ 
+### (5) response
+* include status、data、message fields
+* status、message must be string format,data must be object
+
+| grade 1 | grade 2    | grade 3 | type   | must exist? | encode type | description |
+| :------ | :--------- | :------ | :----- | :---------- | :---------- | :---------- |
+| status  | N/A        | N/A     | string | Yes         | null        | status code |
+| message | N/A        | N/A     | string | Yes         | null        | status info |
+| data    | N/A        | N/A     | object | Yes         | null        | data        |
+|         | swapStatus | N/A     | number | Yes         | null        | swap status |
+
+
+
+* swap status detail
+
+| swap status | descroption       |
+| :---------- | :---------------- |
+| 0           | VerifySigs        |
+| 1           | VerifyTxOk        |
+| 2           | PayOk             |
+| 3           | BlockHashFailed   |
+| 4           | TxHashFailed      |
+| 5           | AmountFailed      |
+| 6           | PubkeyFailed      |
+| 7           | PoolAddressFailed |
+| 8           | MemoFailed        |
+
