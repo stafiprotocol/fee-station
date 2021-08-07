@@ -11,12 +11,12 @@ import (
 	"testing"
 	"time"
 
+	"fee-station/shared/cosmos/rpc"
 	"github.com/JFJun/go-substrate-crypto/ss58"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/types"
 	xBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/stafiprotocol/rtoken-relay/shared/cosmos/rpc"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -13,6 +13,10 @@ require (
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-openapi/spec v0.20.0 // indirect
+	github.com/gorilla/websocket v1.4.2
+	github.com/huandu/xstrings v1.3.2
+	github.com/itering/scale.go v1.0.47
+	github.com/itering/substrate-api-rpc v0.3.5
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
@@ -20,7 +24,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/shopspring/decimal v1.2.0
 	github.com/sirupsen/logrus v1.7.0
-	github.com/stafiprotocol/rtoken-relay v1.0.0
+	github.com/stafiprotocol/go-substrate-rpc-client v1.1.0
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.7.0
