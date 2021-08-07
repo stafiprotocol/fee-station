@@ -14,11 +14,11 @@ type PoolInfo struct {
 	Symbol      string `json:"symbol"`
 	PoolAddress string `json:"poolAddress"` //base58 or hex
 	SwapRate    string `json:"swapRate"`    //decimals 6
-	SwapLimit   string `json:"swapLimit"`   //decimals 12
 }
 
 type RspPoolInfo struct {
 	PoolInfoList []PoolInfo `json:"poolInfoList"`
+	SwapLimit    string     `json:"swapLimit"` //decimals 12
 }
 
 // @Summary get pool info
@@ -48,13 +48,13 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 
 	rsp := RspPoolInfo{
 		PoolInfoList: make([]PoolInfo, 0),
+		SwapLimit:    swapLimitDeci.StringFixed(0),
 	}
 	for _, l := range list {
 		rsp.PoolInfoList = append(rsp.PoolInfoList, PoolInfo{
 			Symbol:      l.Symbol,
 			PoolAddress: l.PoolAddress,
 			SwapRate:    swapRateDeci.StringFixed(0),
-			SwapLimit:   swapLimitDeci.StringFixed(0),
 		})
 	}
 
