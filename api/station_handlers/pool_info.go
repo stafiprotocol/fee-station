@@ -3,13 +3,16 @@ package station_handlers
 import (
 	"fee-station/dao/station"
 	"fee-station/pkg/utils"
+	"math/big"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 )
 
 type PoolInfo struct {
 	Symbol      string `json:"symbol"`
-	PoolAddress string `json:"poolAddress"`
+	PoolAddress string `json:"poolAddress"` //base58 or hex
+	SwapRate    string `json:"swapRate"`    //decimals 18
 }
 
 type RspPoolInfo struct {
@@ -28,6 +31,12 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 		utils.Err(c, err.Error())
 		return
 	}
+	swapRateStr := h.cache[utils.SwapRateKey]
+	swapRateDeci, err := decimal.NewFromString(swapRateStr)
+	if err != nil {
+		swapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 18)
+	}
+
 	rsp := RspPoolInfo{
 		PoolInfoList: make([]PoolInfo, 0),
 	}
@@ -35,6 +44,7 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 		rsp.PoolInfoList = append(rsp.PoolInfoList, PoolInfo{
 			Symbol:      l.Symbol,
 			PoolAddress: l.PoolAddress,
+			SwapRate:    swapRateDeci.StringFixed(0),
 		})
 	}
 

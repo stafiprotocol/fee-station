@@ -4,8 +4,8 @@ ksmTypesPath = ""
 listenAddr = ":8083" 
 logFilePath = "" 
 mode = "release" # debug or release
-swapRate = "1000000000000000000" 
-taskTicker = 10000 # seconds
+swapRate = "1000000000000000000" #decimals 18
+taskTicker = 10 # seconds
 [poolAddress]
 atom = "cosmos1yrdmg324z7lrrr3y0ruczuh459n9l6vgdn8tkn "
 dot = "33e2iTrJ3HDJz3wpdcfa6ooipT6xfMCvpLxkpFaJwkyCvRGM"
