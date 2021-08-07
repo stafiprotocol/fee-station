@@ -13,5 +13,5 @@ type Handler struct {
 }
 
 func NewHandler(db *db.WrapDb, cache map[string]string) *Handler {
-	return &Handler{db: db}
+	return &Handler{db: db, cache: cache}
 }

@@ -7,12 +7,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
+	"github.com/sirupsen/logrus"
 )
 
 type PoolInfo struct {
 	Symbol      string `json:"symbol"`
 	PoolAddress string `json:"poolAddress"` //base58 or hex
-	SwapRate    string `json:"swapRate"`    //decimals 18
+	SwapRate    string `json:"swapRate"`    //decimals 6
 }
 
 type RspPoolInfo struct {
@@ -34,7 +35,8 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 	swapRateStr := h.cache[utils.SwapRateKey]
 	swapRateDeci, err := decimal.NewFromString(swapRateStr)
 	if err != nil {
-		swapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 18)
+		logrus.Errorf("decimal.NewFromString,str:%s err %s", swapRateStr, err)
+		swapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 6)
 	}
 
 	rsp := RspPoolInfo{

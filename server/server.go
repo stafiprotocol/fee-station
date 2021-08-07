@@ -41,8 +41,9 @@ func NewServer(cfg *config.Config, dao *db.WrapDb) (*Server, error) {
 		db:           dao,
 	}
 
-	handler := s.InitHandler(map[string]string{
-		utils.SwapRateKey: s.swapRate})
+	cache := map[string]string{
+		utils.SwapRateKey: s.swapRate}
+	handler := s.InitHandler(cache)
 
 	s.httpServer = &http.Server{
 		Addr:         s.listenAddr,
