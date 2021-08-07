@@ -40,16 +40,12 @@ func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 		return err
 	}
 	for _, swapInfo := range swapInfoList {
-		ok, err := TransferVerify(client, swapInfo)
+		status, err := TransferVerify(client, swapInfo)
 		if err != nil {
 			logrus.Errorf("atom TransferVerify failed: %s", err)
 			continue
 		}
-		if ok {
-			swapInfo.State = utils.SwapStateVerifyTxOk
-		} else {
-			swapInfo.State = utils.SwapStateVerifyTxFailed
-		}
+		swapInfo.State = status
 		err = dao_station.UpOrInSwapInfo(db, swapInfo)
 		if err != nil {
 			logrus.Warnf("dao_station.UpOrInSwapInfo err: %s", err)
@@ -60,56 +56,55 @@ func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 	return nil
 }
 
-func TransferVerify(client *cosmosRpc.Client, swapInfo *dao_station.SwapInfo) (bool, error) {
-	// hashStr := hex.EncodeToString(hexutil.MustDecode(swapInfo.Txhash))
+func TransferVerify(client *cosmosRpc.Client, swapInfo *dao_station.SwapInfo) (uint8, error) {
 	stafiAddressBytes, err := hexutil.Decode(swapInfo.StafiAddress)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
 	blockHashBytes, err := hexutil.Decode(swapInfo.Blockhash)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
 	txHashBytes, err := hexutil.Decode(swapInfo.Txhash)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
 	pubkeyBytes, err := hexutil.Decode(swapInfo.Pubkey)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
 	poolAddr, err := types.AccAddressFromBech32(swapInfo.PoolAddress)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
 
 	inAmountDeci, err := decimal.NewFromString(swapInfo.InAmount)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
 
 	hashStr := hex.EncodeToString(txHashBytes)
 	//check tx hash
 	txRes, err := GetTx(client, hashStr)
 	if err != nil {
-		return false, nil
+		return utils.SwapStateTxHashFailed, nil
 	}
 
 	if txRes.Empty() {
-		return false, nil
+		return utils.SwapStateTxHashFailed, nil
 	}
 
 	if txRes.Code != 0 {
-		return false, nil
+		return utils.SwapStateTxHashFailed, nil
 	}
 
 	//check block hash
 	blockRes, err := GetBlock(client, txRes.Height)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
 	if !bytes.Equal(blockRes.BlockID.Hash, blockHashBytes) {
-		return false, nil
+		return utils.SwapStateBlockHashFailed, nil
 	}
 
 	//check amount and pool
@@ -138,24 +133,24 @@ func TransferVerify(client *cosmosRpc.Client, swapInfo *dao_station.SwapInfo) (b
 		}
 	}
 	if !amountIsMatch {
-		return false, nil
+		return utils.SwapStateAmountFailed, nil
 	}
 	if !poolIsMatch {
-		return false, nil
+		return utils.SwapStatePoolAddressFailed, nil
 	}
 
 	//check pubkey
 	fromAddress, err := types.AccAddressFromBech32(fromAddressStr)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
 	accountRes, err := client.QueryAccount(fromAddress)
 	if err != nil {
-		return false, err
+		return 0, err
 	}
 
 	if !bytes.Equal(accountRes.GetPubKey().Bytes(), pubkeyBytes) {
-		return false, nil
+		return utils.SwapStatePubkeyFailed, nil
 	}
 	//check memo
 	var memoInTx string
@@ -169,14 +164,14 @@ func TransferVerify(client *cosmosRpc.Client, swapInfo *dao_station.SwapInfo) (b
 
 	bonderAddr, err := ss58.Encode(stafiAddressBytes, ss58.StafiPrefix)
 	if err != nil {
-		return false, nil // memo unmatch
+		return 0, err
 	}
 
 	if memoInTx != bonderAddr {
-		return false, nil // memo unmatch
+		return utils.SwapStateMemoFailed, nil // memo unmatch
 	}
 
-	return true, nil
+	return utils.SwapStateVerifyTxOk, nil
 }
 
 func GetTx(client *cosmosRpc.Client, txHash string) (*types.TxResponse, error) {
