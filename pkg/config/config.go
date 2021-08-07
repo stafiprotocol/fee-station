@@ -23,7 +23,8 @@ type Config struct {
 	KeystorePath    string
 	//station
 	AtomDenom   string
-	SwapRate    string //decimal 18
+	SwapRate    string //decimals 6
+	SwapLimit   string //decimals 12
 	PoolAddress PoolAddress
 	Db          Db
 	Endpoint    Endpoint

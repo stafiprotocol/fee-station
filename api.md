@@ -74,7 +74,8 @@
 |         | poolInfoList | N/A         | list   | Yes         | null        | list             |
 |         |              | symbol      | string | Yes         | null        | DOT KSM ATOM ETH |
 |         |              | poolAddress | string | Yes         | null        | pool address     |
-|         |              | swapRate    | string | Yes         | null        | decimals 6      |
+|         |              | swapRate    | string | Yes         | null        | decimals 6       |
+|         |              | swapLimit   | string | Yes         | null        | decimals 12      |
 
 
 ## 3. get swap info

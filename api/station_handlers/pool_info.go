@@ -14,6 +14,7 @@ type PoolInfo struct {
 	Symbol      string `json:"symbol"`
 	PoolAddress string `json:"poolAddress"` //base58 or hex
 	SwapRate    string `json:"swapRate"`    //decimals 6
+	SwapLimit   string `json:"swapLimit"`   //decimals 12
 }
 
 type RspPoolInfo struct {
@@ -33,10 +34,16 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 		return
 	}
 	swapRateStr := h.cache[utils.SwapRateKey]
+	swapLimitStr := h.cache[utils.SwapLimitKey]
 	swapRateDeci, err := decimal.NewFromString(swapRateStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,str:%s err %s", swapRateStr, err)
-		swapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 6)
+		swapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 6) //default 1e6
+	}
+	swapLimitDeci, err := decimal.NewFromString(swapLimitStr)
+	if err != nil {
+		logrus.Errorf("decimal.NewFromString,str:%s err %s", swapLimitStr, err)
+		swapLimitDeci = decimal.NewFromBigInt(big.NewInt(10), 12) //default 10e12
 	}
 
 	rsp := RspPoolInfo{
@@ -47,6 +54,7 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 			Symbol:      l.Symbol,
 			PoolAddress: l.PoolAddress,
 			SwapRate:    swapRateDeci.StringFixed(0),
+			SwapLimit:   swapLimitDeci.StringFixed(0),
 		})
 	}
 

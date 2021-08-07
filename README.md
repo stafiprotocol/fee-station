@@ -5,8 +5,10 @@
 
 ```sh
 make build
-# after config station_conf.toml
-./build/stationd -C ./station_conf.toml
-# after config payer_conf.toml
-./build/payerd -C ./payer_conf.toml
+# after config conf_station.toml
+./build/stationd -C ./conf_station.toml
+# after config conf_checker.toml
+./build/checkerd -C ./conf_checker.toml
+# after config conf_payer.toml
+./build/payerd -C ./conf_payer.toml
 ```

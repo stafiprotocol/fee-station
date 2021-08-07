@@ -1,7 +1,8 @@
 listenAddr = ":8083" 
 logFilePath = "" 
 mode = "release" # debug or release
-swapRate = "1000000" #decimals 6
+swapLimit = "15000000000000" #decimals 12
+swapRate = "1600000" #decimals 6
 
 [poolAddress]
 atom = "cosmos1yrdmg324z7lrrr3y0ruczuh459n9l6vgdn8tkn"
