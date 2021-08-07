@@ -12,10 +12,12 @@ import (
 )
 
 type Config struct {
-	ListenAddr  string
-	TaskTicker  int64  //seconds task interval
-	Mode        string //release debug test
-	LogFilePath string
+	ListenAddr   string
+	TaskTicker   int64  //seconds task interval
+	Mode         string //release debug test
+	LogFilePath  string
+	DotTypesPath string
+	KsmTypesPath string
 	// payer
 	StationEndpoint string
 	KeystorePath    string

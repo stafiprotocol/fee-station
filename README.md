@@ -1,12 +1,12 @@
 # fee-station
 
 
-## use
+## how to use
 
 ```sh
 make build
 # after config station_conf.toml
-./build/stationd
+./build/stationd -C ./station_conf.toml
 # after config payer_conf.toml
-./build/payerd
+./build/payerd -C ./payer_conf.toml
 ```

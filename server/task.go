@@ -21,6 +21,19 @@ func (svr *Server) Task() {
 				logrus.Errorf("task.CheckAtomTx err %s", err)
 			}
 			logrus.Infof("task CheckAtomTx end -----------")
+			logrus.Infof("task CheckDotTx start -----------")
+			err = task.CheckDotTx(svr.db, svr.endPoint.Dot, svr.dotTypesPath)
+			if err != nil {
+				logrus.Errorf("task.CheckDotTx err %s", err)
+			}
+			logrus.Infof("task CheckDotTx end -----------")
+
+			logrus.Infof("task CheckKsmTx start -----------")
+			err = task.CheckKsmTx(svr.db, svr.endPoint.Ksm, svr.ksmTypesPath)
+			if err != nil {
+				logrus.Errorf("task.CheckKsmTx err %s", err)
+			}
+			logrus.Infof("task CheckKsmTx end -----------")
 		}
 
 	}

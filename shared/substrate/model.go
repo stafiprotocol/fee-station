@@ -2,6 +2,7 @@ package substrate
 
 import (
 	"errors"
+	subTypes "fee-station/shared/substrate/types"
 	scalecodec "github.com/itering/scale.go"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 )
@@ -30,15 +31,8 @@ type Transaction struct {
 	CallModuleName string
 	CallName       string
 	Address        interface{}
-	Params         []ExtrinsicParam
+	Params         []subTypes.ExtrinsicParam
 }
-
-type ExtrinsicParam struct {
-	Name  string      `json:"name"`
-	Type  string      `json:"type"`
-	Value interface{} `json:"value"`
-}
-
 
 type Receive struct {
 	Recipient []byte

@@ -40,7 +40,7 @@ func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 		return err
 	}
 	for _, swapInfo := range swapInfoList {
-		status, err := TransferVerify(client, swapInfo)
+		status, err := TransferVerifyAtom(client, swapInfo)
 		if err != nil {
 			logrus.Errorf("atom TransferVerify failed: %s", err)
 			continue
@@ -56,7 +56,7 @@ func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 	return nil
 }
 
-func TransferVerify(client *cosmosRpc.Client, swapInfo *dao_station.SwapInfo) (uint8, error) {
+func TransferVerifyAtom(client *cosmosRpc.Client, swapInfo *dao_station.SwapInfo) (uint8, error) {
 	stafiAddressBytes, err := hexutil.Decode(swapInfo.StafiAddress)
 	if err != nil {
 		return 0, err

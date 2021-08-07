@@ -16,25 +16,29 @@ import (
 )
 
 type Server struct {
-	listenAddr  string
-	httpServer  *http.Server
-	taskTicker  int64
-	swapRate    string //decimal 18
-	atomDenom   string
-	poolAddress config.PoolAddress
-	endPoint    config.Endpoint
-	db          *db.WrapDb
+	listenAddr   string
+	httpServer   *http.Server
+	taskTicker   int64
+	swapRate     string //decimal 18
+	atomDenom    string
+	dotTypesPath string
+	ksmTypesPath string
+	poolAddress  config.PoolAddress
+	endPoint     config.Endpoint
+	db           *db.WrapDb
 }
 
 func NewServer(cfg *config.Config, dao *db.WrapDb) (*Server, error) {
 	s := &Server{
-		listenAddr:  cfg.ListenAddr,
-		taskTicker:  cfg.TaskTicker,
-		swapRate:    cfg.SwapRate,
-		atomDenom:   cfg.AtomDenom,
-		poolAddress: cfg.PoolAddress,
-		endPoint:    cfg.Endpoint,
-		db:          dao,
+		listenAddr:   cfg.ListenAddr,
+		taskTicker:   cfg.TaskTicker,
+		swapRate:     cfg.SwapRate,
+		atomDenom:    cfg.AtomDenom,
+		dotTypesPath: cfg.DotTypesPath,
+		ksmTypesPath: cfg.KsmTypesPath,
+		poolAddress:  cfg.PoolAddress,
+		endPoint:     cfg.Endpoint,
+		db:           dao,
 	}
 
 	handler := s.InitHandler(map[string]string{
