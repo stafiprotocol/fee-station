@@ -12,7 +12,7 @@ type SwapInfo struct {
 	Txhash        string `gorm:"type:varchar(80);not null;default:'0x';column:tx_hash;uniqueIndex:uni_idx_blk_tx"`
 	PoolAddress   string `gorm:"type:varchar(80);not null;default:'';column:pool_address"`
 	Signature     string `gorm:"type:varchar(100);not null;default:'0x';column:signature"`
-	Pubkey        string `gorm:"type:varchar(70);not null;default:'0x';column:pubkey"`
+	Pubkey        string `gorm:"type:varchar(70);not null;default:'0x';column:pubkey"` // when symbol is eth ,this is user address
 	InAmount      string `gorm:"type:varchar(30);not null;default:'0';column:in_amount"`
 	MinOutAmount  string `gorm:"type:varchar(30);not null;default:'0';column:min_out_amount"`
 	OutAmount     string `gorm:"type:varchar(30);not null;default:'0';column:out_amount"`
