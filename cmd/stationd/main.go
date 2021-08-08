@@ -86,7 +86,7 @@ func _main() error {
 // @contact.email tpkeeper.me@gmail.com
 
 // @host localhost:8083
-// @BasePath /fee_station/api
+// @BasePath /feeStation/api
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	debug.SetGCPercent(40)

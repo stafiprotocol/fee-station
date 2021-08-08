@@ -1,4 +1,4 @@
-basePath: /fee_station/api
+basePath: /feeStation/api
 definitions:
   station_handlers.PoolInfo:
     properties:

@@ -10,7 +10,7 @@
         "version": "1.0"
     },
     "host": "localhost:8083",
-    "basePath": "/fee_station/api",
+    "basePath": "/feeStation/api",
     "paths": {
         "/v1/station/poolInfo": {
             "get": {

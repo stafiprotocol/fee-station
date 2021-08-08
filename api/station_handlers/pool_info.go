@@ -69,7 +69,7 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 			utils.Err(c, err.Error())
 			return
 		}
-		symbolPriceDeci, err := decimal.NewFromString(symbolPrice.Symbol)
+		symbolPriceDeci, err := decimal.NewFromString(symbolPrice.Price)
 		if err != nil {
 			utils.Err(c, err.Error())
 			return
