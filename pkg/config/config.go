@@ -25,12 +25,13 @@ type Config struct {
 	FisTypesPath string
 	FisEndpoint  string
 	//station
-	ListenAddr  string
-	AtomDenom   string
-	SwapRate    string //decimals 6
-	SwapLimit   string //decimals 12
-	Mode        string //release debug test
-	PoolAddress PoolAddress
+	ListenAddr   string
+	AtomDenom    string
+	SwapRate     string //decimals 6
+	SwapMaxLimit string //decimals 12
+	SwapMinLimit string //decimals 12
+	Mode         string //release debug test
+	PoolAddress  PoolAddress
 	//common
 	Db Db
 }

@@ -14,8 +14,10 @@ import (
 	"gorm.io/gorm"
 )
 
-var defaultSwapLimitDeci = decimal.NewFromBigInt(big.NewInt(10), 12) //default 10e12
-var defaultSwapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 6)    //default 1e6
+var defaultSwapMaxLimitDeci = decimal.NewFromBigInt(big.NewInt(100), 12) //default 100e12
+var defaultSwapMinLimitDeci = decimal.NewFromBigInt(big.NewInt(1), 12)   //default 1e12
+var defaultSwapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 6)        //default 1e6
+
 type ReqSwapInfo struct {
 	StafiAddress string `json:"stafiAddress"` //hex
 	Symbol       string `json:"symbol"`
@@ -143,16 +145,22 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	}
 	//swap rate
 	swapRateStr := h.cache[utils.SwapRateKey]
-	swapLimitStr := h.cache[utils.SwapLimitKey]
+	swapMaxLimitStr := h.cache[utils.SwapMaxLimitKey]
+	swapMinLimitStr := h.cache[utils.SwapMinLimitKey]
 	swapRateDeci, err := decimal.NewFromString(swapRateStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,swapRateStr: %s err %s", swapRateStr, err)
 		swapRateDeci = defaultSwapRateDeci
 	}
-	swapLimitDeci, err := decimal.NewFromString(swapLimitStr)
+	swapMaxLimitDeci, err := decimal.NewFromString(swapMaxLimitStr)
 	if err != nil {
-		logrus.Errorf("decimal.NewFromString,swapLimitStr: %s err %s", swapLimitStr, err)
-		swapLimitDeci = defaultSwapLimitDeci
+		logrus.Errorf("decimal.NewFromString,swapMaxLimitStr: %s err %s", swapMaxLimitStr, err)
+		swapMaxLimitDeci = defaultSwapMaxLimitDeci
+	}
+	swapMinLimitDeci, err := decimal.NewFromString(swapMinLimitStr)
+	if err != nil {
+		logrus.Errorf("decimal.NewFromString,swapMinLimitStr: %s err %s", swapMinLimitStr, err)
+		swapMinLimitDeci = defaultSwapMinLimitDeci
 	}
 
 	//cal real swap rate
@@ -165,9 +173,14 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	}
 	//out amount
 	outAmount := realSwapRateDeci.Mul(inAmountDeci).Div(decimal.NewFromBigInt(big.NewInt(1), 12))
-	if outAmount.Cmp(swapLimitDeci) > 0 {
-		outAmount = swapLimitDeci
+	if outAmount.Cmp(swapMaxLimitDeci) > 0 {
+		outAmount = swapMaxLimitDeci
 	}
+	if outAmount.Cmp(swapMinLimitDeci) < 0 {
+		utils.Err(c, "out amount less than min limit")
+		return
+	}
+
 	//check min out amount
 	minOutAmountDeci, err := decimal.NewFromString(req.MinOutAmount)
 	if err != nil {

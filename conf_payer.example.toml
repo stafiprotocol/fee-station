@@ -1,7 +1,7 @@
 fisTypesPath = "" 
 keystorePath = "" 
 logFilePath = "" 
-swapLimit = "15000000000000" #decimals 12
+swapMaxLimit = "15000000000000" #decimals 12
 taskTicker = 10 # seconds
 
 [db]

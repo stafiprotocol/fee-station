@@ -20,7 +20,8 @@ type Server struct {
 	httpServer   *http.Server
 	taskTicker   int64
 	swapRate     string //decimals 6
-	swapLimit    string //decimals 12
+	swapMaxLimit string //decimals 12
+	swapMinLimit string //decimals 12
 	atomDenom    string
 	dotTypesPath string
 	ksmTypesPath string
@@ -34,7 +35,8 @@ func NewServer(cfg *config.Config, dao *db.WrapDb) (*Server, error) {
 		listenAddr:   cfg.ListenAddr,
 		taskTicker:   cfg.TaskTicker,
 		swapRate:     cfg.SwapRate,
-		swapLimit:    cfg.SwapLimit,
+		swapMaxLimit: cfg.SwapMaxLimit,
+		swapMinLimit: cfg.SwapMinLimit,
 		atomDenom:    cfg.AtomDenom,
 		dotTypesPath: cfg.DotTypesPath,
 		ksmTypesPath: cfg.KsmTypesPath,
@@ -44,8 +46,9 @@ func NewServer(cfg *config.Config, dao *db.WrapDb) (*Server, error) {
 	}
 
 	cache := map[string]string{
-		utils.SwapRateKey:  s.swapRate,
-		utils.SwapLimitKey: s.swapLimit}
+		utils.SwapRateKey:     s.swapRate,
+		utils.SwapMaxLimitKey: s.swapMaxLimit,
+		utils.SwapMinLimitKey: s.swapMinLimit}
 
 	handler := s.InitHandler(cache)
 

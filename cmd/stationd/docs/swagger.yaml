@@ -45,7 +45,10 @@ definitions:
         items:
           $ref: '#/definitions/station_handlers.PoolInfo'
         type: array
-      swapLimit:
+      swapMaxLimit:
+        description: decimals 12
+        type: string
+      swapMinLimit:
         description: decimals 12
         type: string
     type: object

@@ -14,7 +14,7 @@ type Task struct {
 	keystorePath string
 	fisEndpoint  string
 	payerAccount string
-	swapLimit    string
+	swapMaxLimit string
 	key          *signature.KeyringPair
 	stop         chan struct{}
 	db           *db.WrapDb
@@ -27,7 +27,7 @@ func NewTask(cfg *config.Config, dao *db.WrapDb, key *signature.KeyringPair) *Ta
 		keystorePath: cfg.KeystorePath,
 		fisEndpoint:  cfg.FisEndpoint,
 		payerAccount: cfg.PayerAccount,
-		swapLimit:    cfg.SwapLimit,
+		swapMaxLimit: cfg.SwapMaxLimit,
 		key:          key,
 		stop:         make(chan struct{}),
 		db:           dao,
@@ -54,7 +54,7 @@ out:
 			break out
 		case <-ticker.C:
 			logrus.Infof("task CheckPayInfo start -----------")
-			err := CheckPayInfo(task.db, task.fisTypesPath, task.fisEndpoint, task.swapLimit, task.key)
+			err := CheckPayInfo(task.db, task.fisTypesPath, task.fisEndpoint, task.swapMaxLimit, task.key)
 			if err != nil {
 				logrus.Errorf("task.CheckPayInfo err %s", err)
 			}

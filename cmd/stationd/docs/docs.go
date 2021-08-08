@@ -212,7 +212,11 @@ var doc = `{
                         "$ref": "#/definitions/station_handlers.PoolInfo"
                     }
                 },
-                "swapLimit": {
+                "swapMaxLimit": {
+                    "description": "decimals 12",
+                    "type": "string"
+                },
+                "swapMinLimit": {
                     "description": "decimals 12",
                     "type": "string"
                 }

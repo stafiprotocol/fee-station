@@ -1,6 +1,7 @@
 package utils
 
 const (
-	SwapRateKey  = "swapRateKey"
-	SwapLimitKey = "swapLimitKey"
+	SwapRateKey     = "swapRateKey"
+	SwapMaxLimitKey = "swapMaxLimitKey"
+	SwapMinLimitKey = "swapMinLimitKey"
 )

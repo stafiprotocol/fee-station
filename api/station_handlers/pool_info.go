@@ -17,7 +17,8 @@ type PoolInfo struct {
 
 type RspPoolInfo struct {
 	PoolInfoList []PoolInfo `json:"poolInfoList"`
-	SwapLimit    string     `json:"swapLimit"` //decimals 12
+	SwapMaxLimit string     `json:"swapMaxLimit"` //decimals 12
+	SwapMinLimit string     `json:"swapMinLimit"` //decimals 12
 }
 
 // @Summary get pool info
@@ -33,21 +34,28 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 		return
 	}
 	swapRateStr := h.cache[utils.SwapRateKey]
-	swapLimitStr := h.cache[utils.SwapLimitKey]
+	swapMaxLimitStr := h.cache[utils.SwapMaxLimitKey]
+	swapMinLimitStr := h.cache[utils.SwapMinLimitKey]
 	swapRateDeci, err := decimal.NewFromString(swapRateStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,str:%s err %s", swapRateStr, err)
 		swapRateDeci = defaultSwapRateDeci
 	}
-	swapLimitDeci, err := decimal.NewFromString(swapLimitStr)
+	swapMaxLimitDeci, err := decimal.NewFromString(swapMaxLimitStr)
 	if err != nil {
-		logrus.Errorf("decimal.NewFromString,str:%s err %s", swapLimitStr, err)
-		swapLimitDeci = defaultSwapLimitDeci
+		logrus.Errorf("decimal.NewFromString,swapMaxLimitStr:%s err %s", swapMaxLimitStr, err)
+		swapMaxLimitDeci = defaultSwapMaxLimitDeci
+	}
+	swapMinLimitDeci, err := decimal.NewFromString(swapMinLimitStr)
+	if err != nil {
+		logrus.Errorf("decimal.NewFromString,swapMinLimitStr:%s err %s", swapMinLimitStr, err)
+		swapMinLimitDeci = defaultSwapMinLimitDeci
 	}
 
 	rsp := RspPoolInfo{
 		PoolInfoList: make([]PoolInfo, 0),
-		SwapLimit:    swapLimitDeci.StringFixed(0),
+		SwapMaxLimit: swapMaxLimitDeci.StringFixed(0),
+		SwapMinLimit: swapMinLimitDeci.StringFixed(0),
 	}
 
 	//get fis price
