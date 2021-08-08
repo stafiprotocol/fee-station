@@ -19,18 +19,21 @@
 * data format: application/json
 * data detail:
 
-| field        | type   | notice                                        |
-| :----------- | :----- | :-------------------------------------------- |
-| stafiAddress | string | user stafi address, hex string with 0x prefix |
-| symbol       | string | support: DOT KSM ATOM ETH                     |
-| blockHash    | string | block hash, hex string with 0x prefix         |
-| txHash       | string | tx hash, hex string with 0x prefix            |
-| poolAddress  | string | pool address, get from api                    |
-| signature    | string | signature, hex string with 0x prefix          |
-| pubkey       | string | pubkey, hex string with 0x prefix             |
-| inAmount     | string | in token amount, decimal string, decimals 18  |
-| minOutAmount | string | min out amount, decimal string, decimals 12   |
+| field        | type   | notice                                                          |
+| :----------- | :----- | :-------------------------------------------------------------- |
+| stafiAddress | string | user stafi address, hex string with 0x prefix                   |
+| symbol       | string | support: DOT KSM ATOM ETH                                       |
+| blockHash    | string | block hash, hex string with 0x prefix                           |
+| txHash       | string | tx hash, hex string with 0x prefix                              |
+| poolAddress  | string | pool address, get from api                                      |
+| signature    | string | signature, hex string with 0x prefix                            |
+| pubkey       | string | pubkey, hex string with 0x prefix                               |
+| inAmount     | string | in token amount, decimal string, decimals equal to native token |
+| minOutAmount | string | min out amount, decimal string, decimals 12                     |
 
+* native token decimals
+
+DOT 10, KSM/FIS 12, ETH 18, ATOM 6
 
 
 ### (5) response
