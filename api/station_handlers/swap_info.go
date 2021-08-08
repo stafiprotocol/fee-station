@@ -105,7 +105,7 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	//check signature
 	switch req.Symbol {
 	case utils.SymbolDot, utils.SymbolKsm:
-		ok := utils.VerifySigsSecp256(sigBytes, pubkeyBytes, stafiAddressBytes)
+		ok := utils.VerifiySigsSr25519(sigBytes, pubkeyBytes, stafiAddressBytes)
 		if !ok {
 			utils.Err(c, "signature not right")
 			logrus.Errorf("utils.VerifySigsSecp256 failed, stafi address: %s", req.StafiAddress)
