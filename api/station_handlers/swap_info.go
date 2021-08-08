@@ -17,6 +17,12 @@ import (
 var defaultSwapMaxLimitDeci = decimal.NewFromBigInt(big.NewInt(100), 12) //default 100e12
 var defaultSwapMinLimitDeci = decimal.NewFromBigInt(big.NewInt(1), 12)   //default 1e12
 var defaultSwapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 6)        //default 1e6
+var decimalsMap = map[string]int32{
+	utils.SymbolAtom: 6,
+	utils.SymbolDot:  10,
+	utils.SymbolKsm:  12,
+	utils.SymbolEth:  18,
+}
 
 type ReqSwapInfo struct {
 	StafiAddress string `json:"stafiAddress"` //hex
@@ -172,7 +178,8 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 		return
 	}
 	//out amount
-	outAmount := realSwapRateDeci.Mul(inAmountDeci).Div(decimal.NewFromBigInt(big.NewInt(1), 12))
+	symbolDecimals := decimalsMap[req.Symbol]
+	outAmount := realSwapRateDeci.Mul(inAmountDeci).Div(decimal.NewFromBigInt(big.NewInt(1), symbolDecimals-6))
 	if outAmount.Cmp(swapMaxLimitDeci) > 0 {
 		outAmount = swapMaxLimitDeci
 	}
