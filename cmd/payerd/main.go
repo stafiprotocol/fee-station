@@ -10,6 +10,8 @@ import (
 	"fee-station/pkg/utils"
 	"fee-station/task/payer"
 	"fmt"
+	"github.com/stafiprotocol/chainbridge/utils/crypto/sr25519"
+	"github.com/stafiprotocol/chainbridge/utils/keystore"
 	"os"
 	"runtime"
 	"runtime/debug"
@@ -25,6 +27,12 @@ func _main() error {
 	}
 	log.InitLogFile(cfg.LogFilePath + "/payer")
 	logrus.Infof("config info:%+v ", cfg)
+
+	kp, err := keystore.KeypairFromAddress(cfg.PayerAccount, keystore.SubChain, cfg.KeystorePath, false)
+	if err != nil {
+		return fmt.Errorf("keypairFromAddress err: %s", err)
+	}
+	krp := kp.(*sr25519.Keypair).AsKeyringPair()
 
 	//init db
 	db, err := db.NewDB(&db.Config{
@@ -51,7 +59,7 @@ func _main() error {
 		logrus.Infof("shutting down the db ...")
 		sqlDb.Close()
 	}()
-	t := task.NewTask(cfg, db)
+	t := task.NewTask(cfg, db, krp)
 	err = t.Start()
 	if err != nil {
 		logrus.Errorf("task start err: %s", err)

@@ -55,7 +55,6 @@ func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 			continue
 		}
 	}
-
 	return nil
 }
 

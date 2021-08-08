@@ -9,7 +9,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/btcsuite/btcd v0.22.0-beta
 	github.com/cosmos/cosmos-sdk v0.42.9
-	github.com/ethereum/go-ethereum v1.10.5
+	github.com/ethereum/go-ethereum v1.10.6
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-openapi/spec v0.20.0 // indirect
@@ -24,6 +24,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/shopspring/decimal v1.2.0
 	github.com/sirupsen/logrus v1.7.0
+	github.com/stafiprotocol/chainbridge v0.0.0-20210805135756-9c70218ebc01
 	github.com/stafiprotocol/go-substrate-rpc-client v1.1.0
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/gin-swagger v1.3.0

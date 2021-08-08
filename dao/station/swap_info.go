@@ -36,3 +36,8 @@ func GetSwapInfoListBySymbolState(db *db.WrapDb, symbol string, state uint8) (in
 	err = db.Find(&infos, "symbol = ? and state = ?", symbol, state).Error
 	return
 }
+
+func GetSwapInfoListByState(db *db.WrapDb, state uint8) (infos []*SwapInfo, err error) {
+	err = db.Find(&infos, "state = ?", state).Error
+	return
+}
