@@ -1,5 +1,5 @@
 atomDenom = "stake" 
-coinMarketApi = "" 
+coinMarketApi = "https://web-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest" 
 dotTypesPath = "" 
 ksmTypesPath = "" 
 logFilePath = "" 

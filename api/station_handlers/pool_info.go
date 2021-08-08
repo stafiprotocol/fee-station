@@ -3,7 +3,6 @@ package station_handlers
 import (
 	"fee-station/dao/station"
 	"fee-station/pkg/utils"
-	"math/big"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
@@ -38,23 +37,50 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 	swapRateDeci, err := decimal.NewFromString(swapRateStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,str:%s err %s", swapRateStr, err)
-		swapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 6) //default 1e6
+		swapRateDeci = defaultSwapRateDeci
 	}
 	swapLimitDeci, err := decimal.NewFromString(swapLimitStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,str:%s err %s", swapLimitStr, err)
-		swapLimitDeci = decimal.NewFromBigInt(big.NewInt(10), 12) //default 10e12
+		swapLimitDeci = defaultSwapLimitDeci
 	}
 
 	rsp := RspPoolInfo{
 		PoolInfoList: make([]PoolInfo, 0),
 		SwapLimit:    swapLimitDeci.StringFixed(0),
 	}
+
+	//get fis price
+	fisPrice, err := dao_station.GetTokenPriceBySymbol(h.db, utils.SymbolFis)
+	if err != nil {
+		utils.Err(c, err.Error())
+		return
+	}
+	fisPriceDeci, err := decimal.NewFromString(fisPrice.Price)
+	if err != nil {
+		utils.Err(c, err.Error())
+		return
+	}
+
 	for _, l := range list {
+		//get symbol price
+		symbolPrice, err := dao_station.GetTokenPriceBySymbol(h.db, l.Symbol)
+		if err != nil {
+			utils.Err(c, err.Error())
+			return
+		}
+		symbolPriceDeci, err := decimal.NewFromString(symbolPrice.Symbol)
+		if err != nil {
+			utils.Err(c, err.Error())
+			return
+		}
+		//cal real swap rate
+		realSwapRateDeci := swapRateDeci.Mul(symbolPriceDeci).Div(fisPriceDeci)
+
 		rsp.PoolInfoList = append(rsp.PoolInfoList, PoolInfo{
 			Symbol:      l.Symbol,
 			PoolAddress: l.PoolAddress,
-			SwapRate:    swapRateDeci.StringFixed(0),
+			SwapRate:    realSwapRateDeci.StringFixed(0),
 		})
 	}
 

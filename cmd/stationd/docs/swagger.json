@@ -9,24 +9,70 @@
         },
         "version": "1.0"
     },
-    "host": "xxxxx:8081",
-    "basePath": "/api",
+    "host": "localhost:8083",
+    "basePath": "/fee_station/api",
     "paths": {
-        "/v1/drop_info": {
+        "/v1/station/poolInfo": {
             "get": {
-                "description": "get user drop info",
+                "description": "get pool info",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "v1"
                 ],
-                "summary": "get user drop info",
+                "summary": "get pool info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Rsp"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/station_handlers.RspPoolInfo"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/station/swapInfo": {
+            "get": {
+                "description": "get swap info",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "v1"
+                ],
+                "summary": "get swap info",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "user address",
-                        "name": "user_address",
+                        "description": "token symbol",
+                        "name": "symbol",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "block hash hex string",
+                        "name": "blockHash",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "tx hash hex string",
+                        "name": "txHash",
                         "in": "query",
                         "required": true
                     }
@@ -43,7 +89,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/user_handlers.RspDropInfo"
+                                            "$ref": "#/definitions/station_handlers.RspSwapInfo"
                                         }
                                     }
                                 }
@@ -51,67 +97,35 @@
                         }
                     }
                 }
-            }
-        },
-        "/v1/drop_list": {
-            "get": {
-                "description": "get drop list",
+            },
+            "post": {
+                "description": "post swap info",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "v1"
                 ],
-                "summary": "get drop list",
-                "responses": {
-                    "200": {
-                        "description": "OK",
+                "summary": "post swap info",
+                "parameters": [
+                    {
+                        "description": "user swap info",
+                        "name": "param",
+                        "in": "body",
+                        "required": true,
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/utils.Rsp"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/user_handlers.RspDropList"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/station_handlers.ReqSwapInfo"
                         }
                     }
-                }
-            }
-        },
-        "/v1/drop_rate": {
-            "get": {
-                "description": "get drop rate",
-                "produces": [
-                    "application/json"
                 ],
-                "tags": [
-                    "v1"
-                ],
-                "summary": "get drop rate",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/utils.Rsp"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/user_handlers.RspDropRate"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/utils.Rsp"
                         }
                     }
                 }
@@ -119,58 +133,81 @@
         }
     },
     "definitions": {
-        "user_handlers.Drop": {
+        "station_handlers.PoolInfo": {
             "type": "object",
             "properties": {
-                "drop_amount": {
+                "poolAddress": {
+                    "description": "base58 or hex",
                     "type": "string"
                 },
-                "user_address": {
+                "swapRate": {
+                    "description": "decimals 6",
+                    "type": "string"
+                },
+                "symbol": {
                     "type": "string"
                 }
             }
         },
-        "user_handlers.DropInfo": {
+        "station_handlers.ReqSwapInfo": {
             "type": "object",
             "properties": {
-                "claimed_drop_amount": {
+                "blockHash": {
+                    "description": "hex",
                     "type": "string"
                 },
-                "total_drop_amount": {
+                "inAmount": {
+                    "description": "decimal",
                     "type": "string"
                 },
-                "total_reth_amount": {
+                "minOutAmount": {
+                    "description": "decimal",
                     "type": "string"
                 },
-                "user_address": {
+                "poolAddress": {
+                    "type": "string"
+                },
+                "pubkey": {
+                    "description": "hex",
+                    "type": "string"
+                },
+                "signature": {
+                    "description": "hex",
+                    "type": "string"
+                },
+                "stafiAddress": {
+                    "description": "hex",
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "txHash": {
+                    "description": "hex",
                     "type": "string"
                 }
             }
         },
-        "user_handlers.RspDropInfo": {
+        "station_handlers.RspPoolInfo": {
             "type": "object",
             "properties": {
-                "drop_info": {
-                    "$ref": "#/definitions/user_handlers.DropInfo"
-                }
-            }
-        },
-        "user_handlers.RspDropList": {
-            "type": "object",
-            "properties": {
-                "drop_list": {
+                "poolInfoList": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/user_handlers.Drop"
+                        "$ref": "#/definitions/station_handlers.PoolInfo"
                     }
+                },
+                "swapLimit": {
+                    "description": "decimals 12",
+                    "type": "string"
                 }
             }
         },
-        "user_handlers.RspDropRate": {
+        "station_handlers.RspSwapInfo": {
             "type": "object",
             "properties": {
-                "drop_rate": {
-                    "type": "string"
+                "swapStatus": {
+                    "type": "integer"
                 }
             }
         },

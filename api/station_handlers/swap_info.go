@@ -3,15 +3,19 @@ package station_handlers
 import (
 	dao_station "fee-station/dao/station"
 	"fee-station/pkg/utils"
+	"math/big"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
+var defaultSwapLimitDeci = decimal.NewFromBigInt(big.NewInt(10), 12) //default 10e12
+var defaultSwapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 6)    //default 1e6
 type ReqSwapInfo struct {
 	StafiAddress string `json:"stafiAddress"` //hex
 	Symbol       string `json:"symbol"`
@@ -115,6 +119,66 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 			return
 		}
 	}
+	//get fis price
+	fisPrice, err := dao_station.GetTokenPriceBySymbol(h.db, utils.SymbolFis)
+	if err != nil {
+		utils.Err(c, err.Error())
+		return
+	}
+	fisPriceDeci, err := decimal.NewFromString(fisPrice.Price)
+	if err != nil {
+		utils.Err(c, err.Error())
+		return
+	}
+	//get symbol price
+	symbolPrice, err := dao_station.GetTokenPriceBySymbol(h.db, req.Symbol)
+	if err != nil {
+		utils.Err(c, err.Error())
+		return
+	}
+	symbolPriceDeci, err := decimal.NewFromString(symbolPrice.Price)
+	if err != nil {
+		utils.Err(c, err.Error())
+		return
+	}
+	//swap rate
+	swapRateStr := h.cache[utils.SwapRateKey]
+	swapLimitStr := h.cache[utils.SwapLimitKey]
+	swapRateDeci, err := decimal.NewFromString(swapRateStr)
+	if err != nil {
+		logrus.Errorf("decimal.NewFromString,swapRateStr: %s err %s", swapRateStr, err)
+		swapRateDeci = defaultSwapRateDeci
+	}
+	swapLimitDeci, err := decimal.NewFromString(swapLimitStr)
+	if err != nil {
+		logrus.Errorf("decimal.NewFromString,swapLimitStr: %s err %s", swapLimitStr, err)
+		swapLimitDeci = defaultSwapLimitDeci
+	}
+
+	//cal real swap rate
+	realSwapRateDeci := swapRateDeci.Mul(symbolPriceDeci).Div(fisPriceDeci)
+	//in amount
+	inAmountDeci, err := decimal.NewFromString(req.InAmount)
+	if err != nil {
+		utils.Err(c, err.Error())
+		return
+	}
+	//out amount
+	outAmount := realSwapRateDeci.Mul(inAmountDeci).Div(decimal.NewFromBigInt(big.NewInt(1), 12))
+	if outAmount.Cmp(swapLimitDeci) > 0 {
+		outAmount = swapLimitDeci
+	}
+	//check min out amount
+	minOutAmountDeci, err := decimal.NewFromString(req.MinOutAmount)
+	if err != nil {
+		logrus.Errorf("decimal.NewFromString,minOutAmount: %s err %s", req.MinOutAmount, err)
+		utils.Err(c, err.Error())
+		return
+	}
+	if outAmount.Cmp(minOutAmountDeci) < 0 {
+		utils.Err(c, "real out amount < min out amount")
+		return
+	}
 
 	swapInfo.StafiAddress = strings.ToLower(req.StafiAddress)
 	swapInfo.Symbol = req.Symbol
@@ -125,6 +189,9 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	swapInfo.Pubkey = strings.ToLower(req.Pubkey)
 	swapInfo.InAmount = req.InAmount
 	swapInfo.MinOutAmount = req.MinOutAmount
+	swapInfo.SwapRate = realSwapRateDeci.StringFixed(0)
+	swapInfo.OutAmount = outAmount.StringFixed(0)
+	swapInfo.State = utils.SwapStateVerifySigs
 
 	//update db
 	err = dao_station.UpOrInSwapInfo(h.db, swapInfo)
