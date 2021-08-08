@@ -1,4 +1,5 @@
 atomDenom = "stake" 
+coinMarketApi = "" 
 dotTypesPath = "" 
 ksmTypesPath = "" 
 logFilePath = "" 

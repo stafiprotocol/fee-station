@@ -6,7 +6,7 @@ import "fee-station/pkg/db"
 type TokenPrice struct {
 	db.BaseModel
 	Symbol string `gorm:"type:varchar(10);not null;default:'symbol';column:symbol;uniqueIndex"`
-	Price  string `gorm:"type:varchar(30);not null;default:'0';column:price"`
+	Price  string `gorm:"type:varchar(30);not null;default:'0';column:price"` //decimals 18
 }
 
 func UpOrInTokenPrice(db *db.WrapDb, c *TokenPrice) error {

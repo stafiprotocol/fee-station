@@ -34,6 +34,9 @@ func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 	if err != nil {
 		return err
 	}
+	if len(swapInfoList) == 0 {
+		return nil
+	}
 
 	client, err := cosmosRpc.NewClient(denom, atomEndpoint)
 	if err != nil {

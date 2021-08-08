@@ -12,22 +12,24 @@ import (
 )
 
 type Config struct {
-	ListenAddr   string
-	TaskTicker   int64  //seconds task interval
-	Mode         string //release debug test
-	LogFilePath  string
-	DotTypesPath string
-	KsmTypesPath string
+	TaskTicker  int64 //seconds task interval
+	LogFilePath string
+	//checker
+	DotTypesPath  string
+	KsmTypesPath  string
+	CoinMarketApi string
+	Endpoint      Endpoint
 	// payer
-	StationEndpoint string
-	KeystorePath    string
+	KeystorePath string
 	//station
+	ListenAddr  string
 	AtomDenom   string
 	SwapRate    string //decimals 6
 	SwapLimit   string //decimals 12
+	Mode        string //release debug test
 	PoolAddress PoolAddress
-	Db          Db
-	Endpoint    Endpoint
+	//common
+	Db Db
 }
 
 type PoolAddress struct {

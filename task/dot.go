@@ -20,6 +20,9 @@ func CheckDotTx(db *db.WrapDb, dotEndpoint, typesPath string) error {
 	if err != nil {
 		return err
 	}
+	if len(swapInfoList) == 0 {
+		return nil
+	}
 
 	sc, err := substrate.NewSarpcClient(substrate.ChainTypePolkadot, dotEndpoint, typesPath)
 	if err != nil {

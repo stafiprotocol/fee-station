@@ -141,6 +141,7 @@ const (
 	SymbolKsm  = "KSM"
 	SymbolAtom = "ATOM"
 	SymbolEth  = "ETH"
+	SymbolFis  = "FIS"
 )
 
 var symbolMap = map[string]bool{
@@ -150,6 +151,18 @@ var symbolMap = map[string]bool{
 	SymbolEth:  true,
 }
 
+var priceSymbolMap = map[string]bool{
+	SymbolDot:  true,
+	SymbolKsm:  true,
+	SymbolAtom: true,
+	SymbolEth:  true,
+	SymbolFis:  true,
+}
+
 func SymbolValid(symbol string) bool {
 	return symbolMap[symbol]
+}
+
+func PriceSymbolValid(symbol string) bool {
+	return priceSymbolMap[symbol]
 }

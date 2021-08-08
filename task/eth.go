@@ -19,6 +19,9 @@ func CheckEthTx(db *db.WrapDb, ethEndpoint string) error {
 	if err != nil {
 		return err
 	}
+	if len(swapInfoList) == 0 {
+		return nil
+	}
 
 	client, err := ethclient.Dial(ethEndpoint)
 	if err != nil {

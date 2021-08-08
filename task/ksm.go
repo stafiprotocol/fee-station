@@ -14,6 +14,9 @@ func CheckKsmTx(db *db.WrapDb, ksmEndpoint, typesPath string) error {
 	if err != nil {
 		return err
 	}
+	if len(swapInfoList) == 0 {
+		return nil
+	}
 
 	sc, err := substrate.NewSarpcClient(substrate.ChainTypePolkadot, ksmEndpoint, typesPath)
 	if err != nil {
