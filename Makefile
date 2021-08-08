@@ -10,6 +10,7 @@ build:
 	@echo "  >  \033[32mBuilding binary...\033[0m "
 	cd cmd/stationd && env GOARCH=amd64 go build -o ../../build/stationd
 	cd cmd/checkerd && env GOARCH=amd64 go build -o ../../build/checkerd
+	cd cmd/payerd && env GOARCH=amd64 go build -o ../../build/payerd
 
 ## license: Adds license header to missing files.
 license:

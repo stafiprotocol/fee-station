@@ -21,6 +21,8 @@ type Config struct {
 	Endpoint      Endpoint
 	// payer
 	KeystorePath string
+	FisTypesPath string
+	FisEndpoint  string
 	//station
 	ListenAddr  string
 	AtomDenom   string

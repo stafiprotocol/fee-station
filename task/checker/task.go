@@ -83,6 +83,7 @@ out:
 		}
 	}
 }
+
 func (task *Task) PriceUpdateHandler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()

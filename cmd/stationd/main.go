@@ -9,12 +9,14 @@ import (
 	"fee-station/pkg/config"
 	"fee-station/pkg/db"
 	"fee-station/pkg/log"
+	"fee-station/pkg/utils"
 	"fee-station/server"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"os"
 	"runtime"
 	"runtime/debug"
+
+	"github.com/sirupsen/logrus"
 )
 
 func _main() error {
@@ -23,7 +25,7 @@ func _main() error {
 		fmt.Printf("loadConfig err: %s", err)
 		return err
 	}
-	log.InitLogFile(cfg.LogFilePath+"/station")
+	log.InitLogFile(cfg.LogFilePath + "/station")
 	logrus.Infof("config info:%+v ", cfg)
 
 	//init db
@@ -41,7 +43,7 @@ func _main() error {
 	logrus.Infof("db connect success")
 
 	//interrupt signal
-	ctx := server.ShutdownListener()
+	ctx := utils.ShutdownListener()
 
 	defer func() {
 		sqlDb, err := db.DB.DB()

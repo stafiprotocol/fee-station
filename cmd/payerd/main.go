@@ -8,7 +8,7 @@ import (
 	"fee-station/pkg/db"
 	"fee-station/pkg/log"
 	"fee-station/pkg/utils"
-	"fee-station/task/checker"
+	"fee-station/task/payer"
 	"fmt"
 	"os"
 	"runtime"
@@ -18,12 +18,12 @@ import (
 )
 
 func _main() error {
-	cfg, err := config.Load("conf_checker.toml")
+	cfg, err := config.Load("conf_payer.toml")
 	if err != nil {
 		fmt.Printf("loadConfig err: %s", err)
 		return err
 	}
-	log.InitLogFile(cfg.LogFilePath + "/checker")
+	log.InitLogFile(cfg.LogFilePath + "/payer")
 	logrus.Infof("config info:%+v ", cfg)
 
 	//init db

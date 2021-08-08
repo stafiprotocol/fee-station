@@ -68,7 +68,7 @@ func (svr *Server) ApiServer() {
 	err := svr.httpServer.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		logrus.Errorf("Gin server start err: %s", err.Error())
-		shutdownRequestChannel <- struct{}{} //shutdown server
+		utils.ShutdownRequestChannel <- struct{}{} //shutdown server
 		return
 	}
 	logrus.Infof("Gin server done on %s", svr.listenAddr)
