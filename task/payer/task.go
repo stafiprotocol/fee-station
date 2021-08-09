@@ -11,9 +11,9 @@ import (
 )
 
 // Frequency of polling for a new block
-var (
+const (
 	BlockRetryInterval = time.Second * 6
-	BlockRetryLimit    = 50
+	BlockRetryLimit    = 100
 	BlockConfirmNumber = int64(6)
 )
 
@@ -65,7 +65,7 @@ out:
 			err := CheckPayInfo(task.db, task.fisEndpoint, task.swapMaxLimit, task.key)
 			if err != nil {
 				logrus.Errorf("task.CheckPayInfo err %s", err)
-				panic(err)
+				utils.ShutdownRequestChannel <- struct{}{}
 			}
 			logrus.Infof("task CheckPayInfo end -----------")
 		}

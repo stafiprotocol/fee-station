@@ -29,10 +29,18 @@ func CheckEthTx(db *db.WrapDb, ethEndpoint string) error {
 	var client *ethclient.Client
 	for {
 		if retry > BlockRetryLimit {
-			return fmt.Errorf("cosmosRpc.NewClient reach retry limit")
+			return fmt.Errorf("ethclient.Dial reach retry limit")
 		}
 		client, err = ethclient.Dial(ethEndpoint)
 		if err != nil {
+			logrus.Warnf("ethclient dial: %s", err)
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		_, err = client.BlockNumber(context.Background())
+		if err != nil {
+			logrus.Warnf("ethclient dial: %s", err)
 			time.Sleep(BlockRetryInterval)
 			retry++
 			continue

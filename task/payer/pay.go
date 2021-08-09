@@ -6,6 +6,7 @@ import (
 	"fee-station/pkg/utils"
 	"fee-station/shared/substrate"
 	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/JFJun/go-substrate-crypto/ss58"
@@ -15,6 +16,9 @@ import (
 	"github.com/stafiprotocol/go-substrate-rpc-client/signature"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 )
+
+var batchNumberLimit = 200
+var minReserveValue = big.NewInt(10e12)
 
 func CheckPayInfo(db *db.WrapDb, fisEndpoint, swapLimit string, key *signature.KeyringPair) error {
 	swapInfoList, err := dao_station.GetSwapInfoListByState(db, utils.SwapStateVerifyTxOk)
@@ -43,8 +47,19 @@ func CheckPayInfo(db *db.WrapDb, fisEndpoint, swapLimit string, key *signature.K
 	if err != nil {
 		return err
 	}
+	accountInfo, err := gc.GetAccountInfo()
+	if err != nil {
+		return err
+	}
+	if accountInfo.Data.Free.Cmp(minReserveValue) < 0 {
+		return fmt.Errorf("insufficient balance")
+	}
+	maxTransferAmount := new(big.Int).Sub(accountInfo.Data.Free.Int, minReserveValue)
+
+	willTransferAmount := big.NewInt(0)
 	receives := make([]*substrate.Receive, 0)
-	for _, swapInfo := range swapInfoList {
+	transferMaxIndex := -1
+	for i, swapInfo := range swapInfoList {
 		stafiAddressBytes, err := hexutil.Decode(swapInfo.StafiAddress)
 		if err != nil {
 			return err
@@ -57,11 +72,22 @@ func CheckPayInfo(db *db.WrapDb, fisEndpoint, swapLimit string, key *signature.K
 			return fmt.Errorf("outAmount > swapLimit,out: %s", outAmountDeci.StringFixed(0))
 		}
 
+		tempAmount := new(big.Int).Add(willTransferAmount, outAmountDeci.BigInt())
+		if tempAmount.Cmp(maxTransferAmount) > 0 {
+			break
+		}
+
+		willTransferAmount = tempAmount
+		transferMaxIndex = i
 		receive := substrate.Receive{
 			Recipient: stafiAddressBytes,
 			Value:     types.NewUCompact(outAmountDeci.BigInt()),
 		}
 		receives = append(receives, &receive)
+	}
+
+	if len(receives) == 0 {
+		return fmt.Errorf("insufficient balance")
 	}
 	logrus.Infof("will pay recievers: %v \n", strFi(receives))
 
@@ -70,7 +96,10 @@ func CheckPayInfo(db *db.WrapDb, fisEndpoint, swapLimit string, key *signature.K
 		return err
 	}
 	tx := db.NewTransaction()
-	for _, swapInfo := range swapInfoList {
+	for i, swapInfo := range swapInfoList {
+		if i > transferMaxIndex {
+			break
+		}
 		swapInfo.State = utils.SwapStatePayOk
 		err := dao_station.UpOrInSwapInfo(tx, swapInfo)
 		if err != nil {
@@ -83,7 +112,10 @@ func CheckPayInfo(db *db.WrapDb, fisEndpoint, swapLimit string, key *signature.K
 		return fmt.Errorf("tx.CommitTransaction err: %s", err)
 	}
 
-	for _, swapInfo := range swapInfoList {
+	for i, swapInfo := range swapInfoList {
+		if i > transferMaxIndex {
+			break
+		}
 		new, err := dao_station.GetSwapInfoBySymbolBlkTx(db, swapInfo.Symbol, swapInfo.Blockhash, swapInfo.Txhash)
 		if err != nil {
 			return err

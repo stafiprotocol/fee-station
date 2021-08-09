@@ -26,8 +26,6 @@ func CheckDotTx(db *db.WrapDb, dotEndpoint, typesPath string) error {
 		return nil
 	}
 
-
-
 	retry := 0
 	var sc *substrate.SarpcClient
 	for {
@@ -36,13 +34,13 @@ func CheckDotTx(db *db.WrapDb, dotEndpoint, typesPath string) error {
 		}
 		sc, err = substrate.NewSarpcClient(substrate.ChainTypePolkadot, dotEndpoint, typesPath)
 		if err != nil {
+			logrus.Warnf("substrate.NewSarpcClient err: %s", err)
 			time.Sleep(BlockRetryInterval)
 			retry++
 			continue
 		}
 		break
 	}
-
 
 	retry = 0
 	var gc *substrate.GsrpcClient
@@ -204,6 +202,7 @@ func TransferVerifySubstrate(gc *substrate.GsrpcClient, sc *substrate.SarpcClien
 
 	return utils.SwapStateTxHashFailed, nil
 }
+
 // 222
 // 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a488f0a
 // 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48

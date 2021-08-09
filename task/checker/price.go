@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/shopspring/decimal"
+	"github.com/sirupsen/logrus"
 )
 
 func UpdatePrice(db *db.WrapDb, coinMarketApi string) error {
@@ -28,6 +29,7 @@ func UpdatePrice(db *db.WrapDb, coinMarketApi string) error {
 
 		priceMap, err = GetPriceFromCoinMarket(url)
 		if err != nil {
+			logrus.Warnf("GetPriceFromCoinMarket err: %s", err)
 			time.Sleep(BlockRetryInterval)
 			retry++
 			continue

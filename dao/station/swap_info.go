@@ -6,7 +6,7 @@ import "fee-station/pkg/db"
 type SwapInfo struct {
 	db.BaseModel
 	StafiAddress  string `gorm:"type:varchar(80);not null;default:'0x';column:stafi_address"` //base58 address
-	State         uint8  `gorm:"type:tinyint(1);unsigned;not null;default:0;column:state"`  //0 verify sigs 1 verify tx ok 2 verify tx failed 3 swap ok
+	State         uint8  `gorm:"type:tinyint(1);unsigned;not null;default:0;column:state"`    //0 verify sigs 1 verify tx ok 2 verify tx failed 3 swap ok
 	Symbol        string `gorm:"type:varchar(10);not null;default:'symbol';column:symbol"`
 	Blockhash     string `gorm:"type:varchar(80);not null;default:'0x';column:block_hash;uniqueIndex:uni_idx_blk_tx"`
 	Txhash        string `gorm:"type:varchar(80);not null;default:'0x';column:tx_hash;uniqueIndex:uni_idx_blk_tx"`
@@ -38,6 +38,6 @@ func GetSwapInfoListBySymbolState(db *db.WrapDb, symbol string, state uint8) (in
 }
 
 func GetSwapInfoListByState(db *db.WrapDb, state uint8) (infos []*SwapInfo, err error) {
-	err = db.Find(&infos, "state = ?", state).Error
+	err = db.Limit(200).Find(&infos, "state = ?", state).Error
 	return
 }

@@ -35,7 +35,7 @@ func SafeGo(x func()) {
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {
-				fmt.Printf("SafeGoWithRestart method hit panic: %s \nstack:%s \n", err, stack(3))
+				fmt.Printf("SafeGo method hit panic: %s \nstack:%s \n", err, stack(3))
 			}
 		}()
 		x()

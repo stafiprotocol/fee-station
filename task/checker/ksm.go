@@ -28,13 +28,13 @@ func CheckKsmTx(db *db.WrapDb, ksmEndpoint, typesPath string) error {
 		}
 		sc, err = substrate.NewSarpcClient(substrate.ChainTypePolkadot, ksmEndpoint, typesPath)
 		if err != nil {
+			logrus.Warnf("substrate.NewSarpcClient err: %s", err)
 			time.Sleep(BlockRetryInterval)
 			retry++
 			continue
 		}
 		break
 	}
-
 
 	retry = 0
 	var gc *substrate.GsrpcClient
@@ -44,13 +44,13 @@ func CheckKsmTx(db *db.WrapDb, ksmEndpoint, typesPath string) error {
 		}
 		gc, err = substrate.NewGsrpcClient(ksmEndpoint, substrate.AddressTypeAccountId, nil)
 		if err != nil {
+			logrus.Warnf("substrate.NewSarpcClient err: %s", err)
 			time.Sleep(BlockRetryInterval)
 			retry++
 			continue
 		}
 		break
 	}
-
 
 	for _, swapInfo := range swapInfoList {
 		status, err := TransferVerifySubstrate(gc, sc, swapInfo)

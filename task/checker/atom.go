@@ -22,13 +22,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Frequency of polling for a new block
-var (
-	BlockRetryInterval = time.Second * 6
-	BlockRetryLimit    = 50
-	BlockConfirmNumber = int64(6)
-)
-
 func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 	swapInfoList, err := dao_station.GetSwapInfoListBySymbolState(db, utils.SymbolAtom, utils.SwapStateVerifySigs)
 	if err != nil {
@@ -47,6 +40,14 @@ func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 
 		client, err = cosmosRpc.NewClient(denom, atomEndpoint)
 		if err != nil {
+			logrus.Warnf("cosmosRpc newClient: %s", err)
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		_, err = client.GetCurrentBLockHeight()
+		if err != nil {
+			logrus.Warnf("cosmosRpc newClient: %s", err)
 			time.Sleep(BlockRetryInterval)
 			retry++
 			continue
