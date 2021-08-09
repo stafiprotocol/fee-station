@@ -38,10 +38,22 @@ func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 		return nil
 	}
 
-	client, err := cosmosRpc.NewClient(denom, atomEndpoint)
-	if err != nil {
-		return err
+	retry := 0
+	var client *cosmosRpc.Client
+	for {
+		if retry > BlockRetryLimit {
+			return fmt.Errorf("cosmosRpc.NewClient reach retry limit")
+		}
+
+		client, err = cosmosRpc.NewClient(denom, atomEndpoint)
+		if err != nil {
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		break
 	}
+
 	for _, swapInfo := range swapInfoList {
 		status, err := TransferVerifyAtom(client, swapInfo)
 		if err != nil {
@@ -51,8 +63,8 @@ func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 		swapInfo.State = status
 		err = dao_station.UpOrInSwapInfo(db, swapInfo)
 		if err != nil {
-			logrus.Warnf("dao_station.UpOrInSwapInfo err: %s", err)
-			continue
+			logrus.Errorf("dao_station.UpOrInSwapInfo err: %s", err)
+			return err
 		}
 	}
 	return nil

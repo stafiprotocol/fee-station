@@ -5,7 +5,9 @@ import (
 	dao_station "fee-station/dao/station"
 	"fee-station/pkg/db"
 	"fee-station/pkg/utils"
+	"fmt"
 	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
@@ -23,9 +25,19 @@ func CheckEthTx(db *db.WrapDb, ethEndpoint string) error {
 		return nil
 	}
 
-	client, err := ethclient.Dial(ethEndpoint)
-	if err != nil {
-		return err
+	retry := 0
+	var client *ethclient.Client
+	for {
+		if retry > BlockRetryLimit {
+			return fmt.Errorf("cosmosRpc.NewClient reach retry limit")
+		}
+		client, err = ethclient.Dial(ethEndpoint)
+		if err != nil {
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		break
 	}
 
 	for _, swapInfo := range swapInfoList {
@@ -37,8 +49,8 @@ func CheckEthTx(db *db.WrapDb, ethEndpoint string) error {
 		swapInfo.State = status
 		err = dao_station.UpOrInSwapInfo(db, swapInfo)
 		if err != nil {
-			logrus.Warnf("dao_station.UpOrInSwapInfo err: %s", err)
-			continue
+			logrus.Errorf("dao_station.UpOrInSwapInfo err: %s", err)
+			return err
 		}
 	}
 

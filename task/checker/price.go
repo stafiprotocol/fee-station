@@ -17,10 +17,24 @@ import (
 func UpdatePrice(db *db.WrapDb, coinMarketApi string) error {
 	url := fmt.Sprintf("%s?symbol=%s,%s,%s,%s,%s", coinMarketApi,
 		utils.SymbolAtom, utils.SymbolDot, utils.SymbolEth, utils.SymbolKsm, utils.SymbolFis)
-	priceMap, err := GetPriceFromCoinMarket(url)
-	if err != nil {
-		return err
+
+	retry := 0
+	var priceMap map[string]float64
+	var err error
+	for {
+		if retry > BlockRetryLimit {
+			return fmt.Errorf("cosmosRpc.NewClient reach retry limit")
+		}
+
+		priceMap, err = GetPriceFromCoinMarket(url)
+		if err != nil {
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		break
 	}
+
 	for key, value := range priceMap {
 		token, _ := dao_station.GetTokenPriceBySymbol(db, key)
 		token.Symbol = key

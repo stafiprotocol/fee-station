@@ -5,6 +5,8 @@ import (
 	"fee-station/pkg/db"
 	"fee-station/pkg/utils"
 	"fee-station/shared/substrate"
+	"fmt"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -18,14 +20,37 @@ func CheckKsmTx(db *db.WrapDb, ksmEndpoint, typesPath string) error {
 		return nil
 	}
 
-	sc, err := substrate.NewSarpcClient(substrate.ChainTypePolkadot, ksmEndpoint, typesPath)
-	if err != nil {
-		return err
+	retry := 0
+	var sc *substrate.SarpcClient
+	for {
+		if retry > BlockRetryLimit {
+			return fmt.Errorf("substrate.NewSarpcClient reach retry limit")
+		}
+		sc, err = substrate.NewSarpcClient(substrate.ChainTypePolkadot, ksmEndpoint, typesPath)
+		if err != nil {
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		break
 	}
-	gc, err := substrate.NewGsrpcClient(ksmEndpoint, substrate.AddressTypeAccountId, nil)
-	if err != nil {
-		return err
+
+
+	retry = 0
+	var gc *substrate.GsrpcClient
+	for {
+		if retry > BlockRetryLimit {
+			return fmt.Errorf("substrate.NewGsrpcClient reach retry limit")
+		}
+		gc, err = substrate.NewGsrpcClient(ksmEndpoint, substrate.AddressTypeAccountId, nil)
+		if err != nil {
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		break
 	}
+
 
 	for _, swapInfo := range swapInfoList {
 		status, err := TransferVerifySubstrate(gc, sc, swapInfo)
@@ -36,8 +61,8 @@ func CheckKsmTx(db *db.WrapDb, ksmEndpoint, typesPath string) error {
 		swapInfo.State = status
 		err = dao_station.UpOrInSwapInfo(db, swapInfo)
 		if err != nil {
-			logrus.Warnf("dao_station.UpOrInSwapInfo err: %s", err)
-			continue
+			logrus.Errorf("dao_station.UpOrInSwapInfo err: %s", err)
+			return err
 		}
 	}
 	return nil

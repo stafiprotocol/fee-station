@@ -26,13 +26,37 @@ func CheckDotTx(db *db.WrapDb, dotEndpoint, typesPath string) error {
 		return nil
 	}
 
-	sc, err := substrate.NewSarpcClient(substrate.ChainTypePolkadot, dotEndpoint, typesPath)
-	if err != nil {
-		return err
+
+
+	retry := 0
+	var sc *substrate.SarpcClient
+	for {
+		if retry > BlockRetryLimit {
+			return fmt.Errorf("substrate.NewSarpcClient reach retry limit")
+		}
+		sc, err = substrate.NewSarpcClient(substrate.ChainTypePolkadot, dotEndpoint, typesPath)
+		if err != nil {
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		break
 	}
-	gc, err := substrate.NewGsrpcClient(dotEndpoint, substrate.AddressTypeAccountId, nil)
-	if err != nil {
-		return err
+
+
+	retry = 0
+	var gc *substrate.GsrpcClient
+	for {
+		if retry > BlockRetryLimit {
+			return fmt.Errorf("substrate.NewGsrpcClient reach retry limit")
+		}
+		gc, err = substrate.NewGsrpcClient(dotEndpoint, substrate.AddressTypeAccountId, nil)
+		if err != nil {
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		break
 	}
 
 	for _, swapInfo := range swapInfoList {
@@ -44,8 +68,8 @@ func CheckDotTx(db *db.WrapDb, dotEndpoint, typesPath string) error {
 		swapInfo.State = status
 		err = dao_station.UpOrInSwapInfo(db, swapInfo)
 		if err != nil {
-			logrus.Warnf("dao_station.UpOrInSwapInfo err: %s", err)
-			continue
+			logrus.Errorf("dao_station.UpOrInSwapInfo err: %s", err)
+			return err
 		}
 	}
 
