@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/JFJun/go-substrate-crypto/ss58"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/itering/scale.go/utiles"
 	"github.com/sirupsen/logrus"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
@@ -56,6 +58,11 @@ func TransferVerifySubstrate(gc *substrate.GsrpcClient, sc *substrate.SarpcClien
 	if err != nil {
 		return 0, err
 	}
+	poolAddressByte, err := ss58.Decode(swapInfo.PoolAddress)
+	if err != nil {
+		return 0, err
+	}
+	poolAddressPubkeyHexStr := hexutil.Encode(poolAddressByte[1:33])
 
 	blkNum, err := gc.GetBlockNumber(hash)
 	if err != nil {
@@ -149,16 +156,16 @@ func TransferVerifySubstrate(gc *substrate.GsrpcClient, sc *substrate.SarpcClien
 						return utils.SwapStatePoolAddressFailed, nil
 					}
 
-					if !strings.EqualFold(swapInfo.PoolAddress, utiles.AddHex(d)) {
+					if !strings.EqualFold(poolAddressPubkeyHexStr, utiles.AddHex(d)) {
 						return utils.SwapStatePoolAddressFailed, nil
 					}
 				} else {
-					if !strings.EqualFold(swapInfo.PoolAddress, utiles.AddHex(dest)) {
+					if !strings.EqualFold(poolAddressPubkeyHexStr, utiles.AddHex(dest)) {
 						return utils.SwapStatePoolAddressFailed, nil
 					}
 				}
 			} else if p.Name == substrate.ParamValue && p.Type == substrate.ParamValueType {
-				logrus.Debug("cmp amount", "amount", swapInfo.InAmount, "paramAmount", p.Value)
+				logrus.Info("cmp amount", "amount", swapInfo.InAmount, "paramAmount", p.Value)
 				if fmt.Sprint(swapInfo.InAmount) != fmt.Sprint(p.Value) {
 					return utils.SwapStateAmountFailed, nil
 				}
@@ -173,3 +180,6 @@ func TransferVerifySubstrate(gc *substrate.GsrpcClient, sc *substrate.SarpcClien
 
 	return utils.SwapStateTxHashFailed, nil
 }
+// 222
+// 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a488f0a
+// 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48
