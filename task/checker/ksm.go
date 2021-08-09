@@ -56,7 +56,7 @@ func CheckKsmTx(db *db.WrapDb, ksmEndpoint, typesPath string) error {
 		status, err := TransferVerifySubstrate(gc, sc, swapInfo)
 		if err != nil {
 			logrus.Errorf("dot TransferVerify failed: %s", err)
-			continue
+			return err
 		}
 		swapInfo.State = status
 		err = dao_station.UpOrInSwapInfo(db, swapInfo)

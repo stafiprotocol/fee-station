@@ -6,14 +6,17 @@ import (
 	"fee-station/pkg/utils"
 	"fee-station/shared/substrate"
 	"fmt"
+	"time"
 
+	"github.com/JFJun/go-substrate-crypto/ss58"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/shopspring/decimal"
+	"github.com/sirupsen/logrus"
 	"github.com/stafiprotocol/go-substrate-rpc-client/signature"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 )
 
-func CheckPayInfo(db *db.WrapDb, fisTypesPath, fisEndpoint, swapLimit string, key *signature.KeyringPair) error {
+func CheckPayInfo(db *db.WrapDb, fisEndpoint, swapLimit string, key *signature.KeyringPair) error {
 	swapInfoList, err := dao_station.GetSwapInfoListByState(db, utils.SwapStateVerifyTxOk)
 	if err != nil {
 		return err
@@ -21,10 +24,19 @@ func CheckPayInfo(db *db.WrapDb, fisTypesPath, fisEndpoint, swapLimit string, ke
 	if len(swapInfoList) == 0 {
 		return nil
 	}
-
-	gc, err := substrate.NewGsrpcClient(fisEndpoint, substrate.AddressTypeAccountId, key)
-	if err != nil {
-		return err
+	retry := 0
+	var gc *substrate.GsrpcClient
+	for {
+		if retry > BlockRetryLimit {
+			return fmt.Errorf("substrate.NewGsrpcClient reach retry limit")
+		}
+		gc, err = substrate.NewGsrpcClient(fisEndpoint, substrate.AddressTypeAccountId, key)
+		if err != nil {
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		break
 	}
 
 	swapLimitDeci, err := decimal.NewFromString(swapLimit)
@@ -51,6 +63,8 @@ func CheckPayInfo(db *db.WrapDb, fisTypesPath, fisEndpoint, swapLimit string, ke
 		}
 		receives = append(receives, &receive)
 	}
+	logrus.Infof("will pay recievers: %v \n", strFi(receives))
+
 	err = gc.BatchTransfer(receives)
 	if err != nil {
 		return err
@@ -69,5 +83,26 @@ func CheckPayInfo(db *db.WrapDb, fisTypesPath, fisEndpoint, swapLimit string, ke
 		return fmt.Errorf("tx.CommitTransaction err: %s", err)
 	}
 
+	for _, swapInfo := range swapInfoList {
+		new, err := dao_station.GetSwapInfoBySymbolBlkTx(db, swapInfo.Symbol, swapInfo.Blockhash, swapInfo.Txhash)
+		if err != nil {
+			return err
+		}
+		if new.State != utils.SwapStatePayOk {
+			return fmt.Errorf("pay state in db not update")
+		}
+	}
 	return nil
+}
+
+func strFi(recievers []*substrate.Receive) string {
+	ret := ""
+	for _, re := range recievers {
+		bonderAddr, _ := ss58.Encode(re.Recipient, ss58.StafiPrefix)
+		ret += "\n"
+		ret += bonderAddr
+		ret += " "
+		ret += fmt.Sprintf("%v", re.Value)
+	}
+	return ret
 }

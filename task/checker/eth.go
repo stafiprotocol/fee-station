@@ -44,7 +44,7 @@ func CheckEthTx(db *db.WrapDb, ethEndpoint string) error {
 		status, err := TransferVerifyEth(client, swapInfo)
 		if err != nil {
 			logrus.Errorf("eth TransferVerify failed: %s", err)
-			continue
+			return err
 		}
 		swapInfo.State = status
 		err = dao_station.UpOrInSwapInfo(db, swapInfo)

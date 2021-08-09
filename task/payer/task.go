@@ -3,14 +3,22 @@ package task
 import (
 	"fee-station/pkg/config"
 	"fee-station/pkg/db"
+	"fee-station/pkg/utils"
+	"time"
+
 	"github.com/sirupsen/logrus"
 	"github.com/stafiprotocol/go-substrate-rpc-client/signature"
-	"time"
+)
+
+// Frequency of polling for a new block
+var (
+	BlockRetryInterval = time.Second * 6
+	BlockRetryLimit    = 50
+	BlockConfirmNumber = int64(6)
 )
 
 type Task struct {
 	taskTicker   int64
-	fisTypesPath string
 	keystorePath string
 	fisEndpoint  string
 	payerAccount string
@@ -23,7 +31,6 @@ type Task struct {
 func NewTask(cfg *config.Config, dao *db.WrapDb, key *signature.KeyringPair) *Task {
 	s := &Task{
 		taskTicker:   cfg.TaskTicker,
-		fisTypesPath: cfg.FisTypesPath,
 		keystorePath: cfg.KeystorePath,
 		fisEndpoint:  cfg.FisEndpoint,
 		payerAccount: cfg.PayerAccount,
@@ -36,6 +43,7 @@ func NewTask(cfg *config.Config, dao *db.WrapDb, key *signature.KeyringPair) *Ta
 }
 
 func (task *Task) Start() error {
+	utils.SafeGoWithRestart(task.Handler)
 	return nil
 }
 
@@ -54,9 +62,10 @@ out:
 			break out
 		case <-ticker.C:
 			logrus.Infof("task CheckPayInfo start -----------")
-			err := CheckPayInfo(task.db, task.fisTypesPath, task.fisEndpoint, task.swapMaxLimit, task.key)
+			err := CheckPayInfo(task.db, task.fisEndpoint, task.swapMaxLimit, task.key)
 			if err != nil {
 				logrus.Errorf("task.CheckPayInfo err %s", err)
+				panic(err)
 			}
 			logrus.Infof("task CheckPayInfo end -----------")
 		}

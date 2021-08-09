@@ -58,7 +58,7 @@ func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 		status, err := TransferVerifyAtom(client, swapInfo)
 		if err != nil {
 			logrus.Errorf("atom TransferVerify failed: %s", err)
-			continue
+			return err
 		}
 		swapInfo.State = status
 		err = dao_station.UpOrInSwapInfo(db, swapInfo)

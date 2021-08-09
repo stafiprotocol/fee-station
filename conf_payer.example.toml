@@ -1,7 +1,8 @@
-fisTypesPath = "" 
-keystorePath = "" 
+fisEndPoint = "ws://127.0.0.1:9944" 
+keystorePath = "/Users/tpkeeper/gowork/stafi/fee-station/keys" 
 logFilePath = "" 
-swapMaxLimit = "15000000000000" #decimals 12
+payerAccount = "34PAx5KPyne2r8vHhBMaesFo1JCG57cnC5qNwSYWmgNmtaWP" 
+swapMaxLimit = "150000000000000" #decimals 12
 taskTicker = 10 # seconds
 
 [db]

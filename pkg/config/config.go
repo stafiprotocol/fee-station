@@ -22,7 +22,6 @@ type Config struct {
 	// payer
 	KeystorePath string
 	PayerAccount string
-	FisTypesPath string
 	FisEndpoint  string
 	//station
 	ListenAddr   string

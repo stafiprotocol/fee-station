@@ -253,7 +253,7 @@ func (gc *GsrpcClient) watchSubmission(sub *author.ExtrinsicStatusSubscription) 
 		case status := <-sub.Chan():
 			switch {
 			case status.IsInBlock:
-				logrus.Info("Extrinsic included in block", "block", status.AsInBlock.Hex())
+				logrus.Info("Extrinsic included in block ", "block ", status.AsInBlock.Hex())
 				return nil
 			case status.IsRetracted:
 				return fmt.Errorf("extrinsic retracted: %s", status.AsRetracted.Hex())
@@ -291,13 +291,13 @@ func (gc *GsrpcClient) signExtrinsic(xt interface{}) error {
 	}
 
 	if ext, ok := xt.(*types.Extrinsic); ok {
-		logrus.Info("signExtrinsic", "addressType", gc.addressType)
+		logrus.Info("signExtrinsic ", "addressType ", gc.addressType)
 		err = ext.Sign(*gc.key, o)
 		if err != nil {
 			return err
 		}
 	} else if ext, ok := xt.(*types.ExtrinsicMulti); ok {
-		logrus.Info("signExtrinsic", "addressType1", gc.addressType)
+		logrus.Info("signExtrinsic ", "addressType1 ", gc.addressType)
 		err = ext.Sign(*gc.key, o)
 		if err != nil {
 			return err

@@ -1,14 +1,14 @@
 atomDenom = "stake" 
 coinMarketApi = "https://web-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest" 
-dotTypesPath = "" 
-ksmTypesPath = "" 
+dotTypesPath = "/Users/tpkeeper/gowork/stafi/fee-station/network/polkadot.json" 
+ksmTypesPath = "/Users/tpkeeper/gowork/stafi/fee-station/network/kusama.json" 
 logFilePath = "" 
 taskTicker = 10 # seconds
 
 [endpoint]
-atom = ""
-dot = ""
-eth = ""
+atom = "http://127.0.0.1:26657"
+dot = "ws://127.0.0.1:9944"
+eth = "https://ropsten.infura.io/v3/xxxxx"
 ksm = ""
 
 [db]
