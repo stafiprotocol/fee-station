@@ -117,7 +117,7 @@ DOT 10, KSM/FIS 12, ETH 18, ATOM 6
 
 * swap status detail
 
-| swap status | descroption       |
+| swap status | description       |
 | :---------- | :---------------- |
 | 0           | VerifySigs        |
 | 1           | VerifyTxOk        |

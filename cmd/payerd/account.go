@@ -51,6 +51,11 @@ var (
 		Name:  "latest",
 		Usage: "Overrides blockstore and start block, starts from latest block",
 	}
+	ConfigPath = &cli.StringFlag{
+		Name:  "C",
+		Usage: "Path to configfile",
+		Value: "./conf_payer.toml",
+	}
 )
 
 // Metrics flags

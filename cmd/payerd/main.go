@@ -86,6 +86,7 @@ var cliFlags = []cli.Flag{
 	ConfigFileFlag,
 	VerbosityFlag,
 	KeystorePathFlag,
+	ConfigPath,
 }
 
 var generateFlags = []cli.Flag{
@@ -93,10 +94,9 @@ var generateFlags = []cli.Flag{
 }
 
 var accountCommand = cli.Command{
-	Name:  "accounts",
-	Usage: "manage payer keystore",
-	Description: "The accounts command is used to manage the reth keystore.\n" +
-		"\tTo generate a ethereum keystore: chainbridge accounts geneth\n",
+	Name:        "accounts",
+	Usage:       "manage payer keystore",
+	Description: "The accounts command is used to manage the payer keystore.\n",
 	Subcommands: []*cli.Command{
 		{
 			Action: wrapHandler(handleGenerateSubCmd),
@@ -104,14 +104,6 @@ var accountCommand = cli.Command{
 			Usage:  "generate subsrate keystore",
 			Flags:  generateFlags,
 			Description: "The generate subcommand is used to generate the substrate keystore.\n" +
-				"\tkeystore path should be given.",
-		},
-		{
-			Action: wrapHandler(handleGenerateEthCmd),
-			Name:   "geneth",
-			Usage:  "generate ethereum keystore",
-			Flags:  generateFlags,
-			Description: "The generate subcommand is used to generate the ethereum keystore.\n" +
 				"\tkeystore path should be given.",
 		},
 	},
