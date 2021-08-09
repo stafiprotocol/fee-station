@@ -5,6 +5,7 @@ import (
 	"fee-station/pkg/utils"
 	"math/big"
 	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -61,6 +62,10 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	var stafiAddressBytes []byte
 	if stafiAddressBytes, err = hexutil.Decode(req.StafiAddress); err != nil {
 		utils.Err(c, "stafiAddress format err")
+		return
+	}
+	if len(stafiAddressBytes) != 32 {
+		utils.Err(c, "stafiAddress err")
 		return
 	}
 	if _, err := hexutil.Decode(req.Blockhash); err != nil {
@@ -133,6 +138,13 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 		utils.Err(c, err.Error())
 		return
 	}
+	//check old price
+	duration := int(time.Now().Unix()) - fisPrice.UpdatedAt
+	if duration > 60*60 {
+		utils.Err(c, "price too old")
+		return
+	}
+
 	fisPriceDeci, err := decimal.NewFromString(fisPrice.Price)
 	if err != nil {
 		utils.Err(c, err.Error())
