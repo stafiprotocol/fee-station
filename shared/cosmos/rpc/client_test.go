@@ -3,17 +3,13 @@ package rpc_test
 import (
 	"bytes"
 	"encoding/hex"
-	"errors"
-	"fmt"
 	"sort"
-	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"fee-station/shared/cosmos/rpc"
 	"github.com/JFJun/go-substrate-crypto/ss58"
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/types"
 	xBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -55,13 +51,10 @@ func TestGetAddrHex(t *testing.T) {
 }
 
 func init() {
-	key, err := keyring.New(types.KeyringServiceName(), keyring.BackendFile, "/Users/tpkeeper/.gaia", strings.NewReader("tpkeeper\n"))
-	if err != nil {
-		panic(err)
-	}
 
 	// client, err = rpc.NewClient(key, "stargate-final", "recipient", "0.04umuon", "umuon", "https://testcosmosrpc.wetez.io:443")
-	client, err = rpc.NewClient(key, "stargate-final", "recipient", "0.04umuon", "umuon", "http://127.0.0.1:26657")
+	var err error
+	client, err = rpc.NewClient("umuon", "http://127.0.0.1:26657")
 	if err != nil {
 		panic(err)
 	}
@@ -70,78 +63,6 @@ func init() {
 //{"height":"901192","txhash":"327DA2048B6D66BCB27C0F1A6D1E407D88FE719B95A30D108B5906FD6934F7B1","codespace":"","code":0,"data":"0A060A0473656E64","raw_log":"[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cosmos1ak3nrcmm7e4j8y7ycfc78pxl4g4lehf43vw6wu\"},{\"key\":\"sender\",\"value\":\"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf\"},{\"key\":\"amount\",\"value\":\"100umuon\"}]}]}]","logs":[{"msg_index":0,"log":"","events":[{"type":"message","attributes":[{"key":"action","value":"send"},{"key":"sender","value":"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf"},{"key":"module","value":"bank"}]},{"type":"transfer","attributes":[{"key":"recipient","value":"cosmos1ak3nrcmm7e4j8y7ycfc78pxl4g4lehf43vw6wu"},{"key":"sender","value":"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf"},{"key":"amount","value":"100umuon"}]}]}],"info":"","gas_wanted":"200000","gas_used":"51169","tx":null,"timestamp":""}
 //{"height":"903451","txhash":"0E4F8F8FF7A3B67121711DA17FBE5AE8CB25DB272DDBF7DC0E02122947266604","codespace":"","code":0,"data":"0A060A0473656E64","raw_log":"[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cosmos1ak3nrcmm7e4j8y7ycfc78pxl4g4lehf43vw6wu\"},{\"key\":\"sender\",\"value\":\"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf\"},{\"key\":\"amount\",\"value\":\"10umuon\"}]}]}]","logs":[{"msg_index":0,"log":"","events":[{"type":"message","attributes":[{"key":"action","value":"send"},{"key":"sender","value":"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf"},{"key":"module","value":"bank"}]},{"type":"transfer","attributes":[{"key":"recipient","value":"cosmos1ak3nrcmm7e4j8y7ycfc78pxl4g4lehf43vw6wu"},{"key":"sender","value":"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf"},{"key":"amount","value":"10umuon"}]}]}],"info":"","gas_wanted":"200000","gas_used":"51159","tx":null,"timestamp":""}
 //block hash 0x16E8297663210ABF6937FE4C1C139D4BACD0D27A22EFD9E3FE06B1DA8E3F7BB3
-func TestClient_SendTo(t *testing.T) {
-	err := client.SingleTransferTo(addrMultiSig1, types.NewCoins(types.NewInt64Coin(client.GetDenom(), 50000)))
-	assert.NoError(t, err)
-}
-
-func TestClient_ReDelegate(t *testing.T) {
-	h, err := client.SingleReDelegate(addrValidatorTestnetAteam, addrValidatorTestnetStation,
-		types.NewCoin(client.GetDenom(), types.NewInt(10)))
-	assert.NoError(t, err)
-	t.Log("hash", h)
-}
-
-func TestClient_GenRawTx(t *testing.T) {
-	err := client.SetFromName("multiSign1")
-	assert.NoError(t, err)
-	rawTx, err := client.GenMultiSigRawTransferTx(addrReceive, types.NewCoins(types.NewInt64Coin(client.GetDenom(), 10)))
-	assert.NoError(t, err)
-	t.Log(string(rawTx))
-}
-
-func TestClient_SignRawTx(t *testing.T) {
-	err := client.SetFromName("multiSign1")
-	assert.NoError(t, err)
-	rawTx, err := client.GenMultiSigRawTransferTx(addrReceive, types.NewCoins(types.NewInt64Coin(client.GetDenom(), 10)))
-	assert.NoError(t, err)
-
-	signature, err := client.SignMultiSigRawTx(rawTx, "key1")
-	assert.NoError(t, err)
-	t.Log(string(signature))
-}
-
-func TestClient_CreateMultiSigTx(t *testing.T) {
-	err := client.SetFromName("multiSign1")
-	assert.NoError(t, err)
-	rawTx, err := client.GenMultiSigRawTransferTx(addrReceive, types.NewCoins(types.NewInt64Coin(client.GetDenom(), 10)))
-	assert.NoError(t, err)
-
-	signature1, err := client.SignMultiSigRawTxWithSeq(56, rawTx, "key1")
-	assert.NoError(t, err)
-	t.Log(string(signature1))
-
-	signature2, err := client.SignMultiSigRawTxWithSeq(56, rawTx, "key3")
-	assert.NoError(t, err)
-	t.Log(string(signature2))
-	//signature3, err := client.SignMultiSigRawTxWithSeq(56, rawTx, "key2")
-	//assert.NoError(t, err)
-	//t.Log(string(signature2))
-	hash, tx, err := client.AssembleMultiSigTx(rawTx, [][]byte{signature2, signature1}, 2)
-	assert.NoError(t, err)
-	t.Log(hex.EncodeToString(hash))
-	t.Log(string(tx))
-
-	txHash, err := client.BroadcastTx(tx)
-	assert.NoError(t, err)
-	t.Log(txHash)
-}
-
-func TestClient_BroadcastTx(t *testing.T) {
-	err := client.SetFromName("multiSign1")
-	assert.NoError(t, err)
-	rawTx, err := client.GenMultiSigRawTransferTx(addrReceive, types.NewCoins(types.NewInt64Coin(client.GetDenom(), 10)))
-	assert.NoError(t, err)
-
-	signature1, err := client.SignMultiSigRawTx(rawTx, "key1")
-	assert.NoError(t, err)
-
-	_, tx, err := client.AssembleMultiSigTx(rawTx, [][]byte{signature1}, 2)
-	assert.NoError(t, err)
-
-	_, err = client.BroadcastTx(tx)
-	assert.ErrorIs(t, err, errors.New(fmt.Sprintf("Boradcast err with res.code: %d", 4)))
-}
 
 func TestClient_QueryTxByHash(t *testing.T) {
 	res, err := client.QueryTxByHash("6C017062FD3F48F13B640E5FEDD59EB050B148E67EF12EC0A511442D32BD4C88")
@@ -153,167 +74,6 @@ func TestClient_QueryTxByHash(t *testing.T) {
 		t.Log(msg.Type())
 		t.Log(msg.Route())
 	}
-}
-
-func TestClient_QueryDelegationRewards(t *testing.T) {
-	res, err := client.QueryDelegationRewards(addrMultiSig1, addrValidator, 0)
-	assert.NoError(t, err)
-	t.Log(res.GetRewards().AmountOf(client.GetDenom()))
-}
-
-func TestClient_GenMultiSigRawDelegateTx(t *testing.T) {
-	err := client.SetFromName("multiSign1")
-	assert.NoError(t, err)
-	rawTx, err := client.GenMultiSigRawDelegateTx(addrMultiSig1, []types.ValAddress{adrValidatorEverStake}, types.NewCoin(client.GetDenom(), types.NewInt(1)))
-	assert.NoError(t, err)
-
-	signature1, err := client.SignMultiSigRawTx(rawTx, "key1")
-	assert.NoError(t, err)
-	signature2, err := client.SignMultiSigRawTx(rawTx, "key2")
-	assert.NoError(t, err)
-	signature3, err := client.SignMultiSigRawTx(rawTx, "key3")
-	assert.NoError(t, err)
-
-	_, tx, err := client.AssembleMultiSigTx(rawTx, [][]byte{signature1, signature2, signature3}, 2)
-	assert.NoError(t, err)
-
-	hash, err := client.BroadcastTx(tx)
-	assert.NoError(t, err)
-	t.Log("hash", hash)
-}
-
-func TestClient_GenMultiSigRawReDelegateTx(t *testing.T) {
-	err := client.SetFromName("multiSign1")
-
-	assert.NoError(t, err)
-	rawTx, err := client.GenMultiSigRawReDelegateTx(addrMultiSig1, addrValidatorTestnetAteam, addrValidatorTestnetStation,
-		types.NewCoin(client.GetDenom(), types.NewInt(10)))
-	assert.NoError(t, err)
-
-	signature1, err := client.SignMultiSigRawTx(rawTx, "key1")
-	assert.NoError(t, err)
-	signature2, err := client.SignMultiSigRawTx(rawTx, "key2")
-	assert.NoError(t, err)
-	//signature3, err := client.SignMultiSigRawTx(rawTx, "key3")
-	//assert.NoError(t, err)
-
-	_, tx, err := client.AssembleMultiSigTx(rawTx, [][]byte{signature1, signature2}, 2)
-	assert.NoError(t, err)
-
-	txHash, err := client.BroadcastTx(tx)
-	assert.NoError(t, err)
-	t.Log(txHash)
-}
-
-func TestClient_GenMultiSigRawWithdrawDeleRewardTx(t *testing.T) {
-	err := client.SetFromName("multiSign1")
-	assert.NoError(t, err)
-	rawTx, err := client.GenMultiSigRawWithdrawDeleRewardTx(addrMultiSig1, addrValidatorTestnetAteam)
-	assert.NoError(t, err)
-
-	signature1, err := client.SignMultiSigRawTx(rawTx, "key2")
-	assert.NoError(t, err)
-	signature2, err := client.SignMultiSigRawTx(rawTx, "key3")
-	assert.NoError(t, err)
-
-	h, tx, err := client.AssembleMultiSigTx(rawTx, [][]byte{signature1, signature2}, 2)
-	assert.NoError(t, err)
-	t.Log(hex.EncodeToString(h))
-	hash, err := client.BroadcastTx(tx)
-	assert.NoError(t, err)
-	t.Log(hash)
-}
-
-func TestClient_GenMultiSigRawWithdrawDeleRewardAndDelegratTx(t *testing.T) {
-	err := client.SetFromName("multiSign1")
-	assert.NoError(t, err)
-	rawTx, err := client.GenMultiSigRawWithdrawAllRewardThenDeleTx(addrMultiSig1, 0)
-	assert.NoError(t, err)
-	t.Log(string(rawTx))
-
-	signature1, err := client.SignMultiSigRawTx(rawTx, "key2")
-	assert.NoError(t, err)
-	signature2, err := client.SignMultiSigRawTx(rawTx, "key3")
-	assert.NoError(t, err)
-
-	h, tx, err := client.AssembleMultiSigTx(rawTx, [][]byte{signature1, signature2}, 2)
-	assert.NoError(t, err)
-	t.Log(string(tx))
-	t.Log(hex.EncodeToString(h))
-	hash, err := client.BroadcastTx(tx)
-	assert.NoError(t, err)
-	t.Log(hash)
-}
-
-func TestClient_GenMultiSigRawWithdrawAllRewardTx(t *testing.T) {
-	err := client.SetFromName("multiSign1")
-	assert.NoError(t, err)
-	rawTx, err := client.GenMultiSigRawWithdrawAllRewardTx(addrMultiSig1, 0)
-	assert.NoError(t, err)
-	t.Log(string(rawTx))
-
-	signature1, err := client.SignMultiSigRawTx(rawTx, "key2")
-	assert.NoError(t, err)
-	signature2, err := client.SignMultiSigRawTx(rawTx, "key3")
-	assert.NoError(t, err)
-
-	h, tx, err := client.AssembleMultiSigTx(rawTx, [][]byte{signature1, signature2}, 2)
-	assert.NoError(t, err)
-	t.Log(string(tx))
-	t.Log(hex.EncodeToString(h))
-	hash, err := client.BroadcastTx(tx)
-	assert.NoError(t, err)
-	t.Log(hash)
-}
-
-//0xf954ad81a546df9de6c79051ca67f7d0d08e9d861604c76fb8767dce2ce8d4f8
-func TestClient_GenMultiSigRawUnDelegateTx(t *testing.T) {
-	err := client.SetFromName("multiSign1")
-	assert.NoError(t, err)
-	rawTx, err := client.GenMultiSigRawUnDelegateTx(addrMultiSig1, []types.ValAddress{adrValidatorEverStake},
-		types.NewCoin(client.GetDenom(), types.NewInt(10)))
-
-	assert.NoError(t, err)
-
-	signature1, err := client.SignMultiSigRawTx(rawTx, "key2")
-	assert.NoError(t, err)
-	signature2, err := client.SignMultiSigRawTx(rawTx, "key3")
-	assert.NoError(t, err)
-
-	hash, tx, err := client.AssembleMultiSigTx(rawTx, [][]byte{signature1, signature2}, 2)
-	assert.NoError(t, err)
-	t.Log("hash", hex.EncodeToString(hash))
-	hash2, err := client.BroadcastTx(tx)
-	t.Log("hash2", hash2)
-	assert.NoError(t, err)
-}
-
-func TestClient_GenMultiSigRawBatchTransferTx(t *testing.T) {
-	err := client.SetFromName("multiSign1")
-	assert.NoError(t, err)
-	out1 := xBankTypes.Output{
-		Address: addrReceive.String(),
-		Coins:   types.NewCoins(types.NewCoin(client.GetDenom(), types.NewInt(10))),
-	}
-	out2 := xBankTypes.Output{
-		Address: addrKey1.String(),
-		Coins:   types.NewCoins(types.NewCoin(client.GetDenom(), types.NewInt(10))),
-	}
-
-	rawTx, err := client.GenMultiSigRawBatchTransferTx(addrMultiSig1, []xBankTypes.Output{out1, out2})
-	assert.NoError(t, err)
-
-	signature1, err := client.SignMultiSigRawTx(rawTx, "key2")
-	assert.NoError(t, err)
-	signature2, err := client.SignMultiSigRawTx(rawTx, "key3")
-	assert.NoError(t, err)
-
-	_, tx, err := client.AssembleMultiSigTx(rawTx, [][]byte{signature1, signature2}, 2)
-	assert.NoError(t, err)
-
-	txHash, err := client.BroadcastTx(tx)
-	assert.NoError(t, err)
-	t.Log(txHash)
 }
 
 func TestGetPubKey(t *testing.T) {
@@ -351,10 +111,13 @@ func TestAddress(t *testing.T) {
 	addrKey2, _ := types.AccAddressFromBech32("cosmos1ztquzhpkve7szl99jkugq4l8jtpnhln76aetam")
 	addrKey3, _ := types.AccAddressFromBech32("cosmos12zz2hm02sxe9f4pwt7y5q9wjhcu98vnuwmjz4x")
 	addrKey4, _ := types.AccAddressFromBech32("cosmos12yprrdprzat35zhqxe2fcnn3u26gwlt6xcq0pj")
+	pub, _ := types.GetPubKeyFromBech32(types.Bech32PubKeyTypeAccPub, "cosmospub1addwnpepqdj34s6y43njffwgpd83dr7smf03d9e5xzajt9lvqhen3avlfrnv7ya9n6t")
+
 	t.Log(hex.EncodeToString(addrKey1.Bytes()))
 	t.Log(hex.EncodeToString(addrKey2.Bytes()))
 	t.Log(hex.EncodeToString(addrKey3.Bytes()))
 	t.Log(hex.EncodeToString(addrKey4.Bytes()))
+	t.Log(hex.EncodeToString(pub.Bytes()))//03651ac344ac6724a5c80b4f168fd0da5f16973430bb2597ec05f338f59f48e6cf
 	//client_test.go:347: e9f6828e559dbf7dbac9a319d3b58b41abcc34a4
 	//client_test.go:348: 12c1c15c36667d017ca595b88057e792c33bfe7e
 	//client_test.go:349: 5084abedea81b254d42e5f894015d2be3853b27c
@@ -383,39 +146,6 @@ func TestClient_GetSequence(t *testing.T) {
 	assert.NoError(t, err)
 	t.Log(seq)
 	t.Log(hex.EncodeToString(addrValidatorTestnetAteam.Bytes()))
-}
-
-func TestMaxTransfer(t *testing.T) {
-	err := client.SetFromName("multiSign1")
-	assert.NoError(t, err)
-	outputs := make([]xBankTypes.Output, 0)
-	for i := 0; i < 3; i++ {
-		out1 := xBankTypes.Output{
-			Address: addrReceive.String(),
-			Coins:   types.NewCoins(types.NewCoin(client.GetDenom(), types.NewInt(1))),
-		}
-		outputs = append(outputs, out1)
-	}
-
-	rawTx, err := client.GenMultiSigRawBatchTransferTx(addrMultiSig1, outputs)
-	assert.NoError(t, err)
-
-	sequence, err := client.GetSequence(0, addrMultiSig1)
-	assert.NoError(t, err)
-	signature1, err := client.SignMultiSigRawTxWithSeq(sequence, rawTx, "key2")
-	assert.NoError(t, err)
-	signature2, err := client.SignMultiSigRawTxWithSeq(sequence, rawTx, "key3")
-	assert.NoError(t, err)
-	t.Log(string(signature1))
-	t.Log(string(signature2))
-
-	hash, tx, err := client.AssembleMultiSigTx(rawTx, [][]byte{signature1, signature2}, 2)
-	assert.NoError(t, err)
-	t.Log(hex.EncodeToString(hash))
-	t.Log(len(tx))
-	txHash, err := client.BroadcastTx(tx)
-	assert.NoError(t, err)
-	t.Log(txHash)
 }
 
 func TestMemo(t *testing.T) {

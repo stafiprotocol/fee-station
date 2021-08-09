@@ -45,12 +45,6 @@ func NewClient(denom, endPoint string) (*Client, error) {
 		endPoint:  endPoint,
 	}
 
-	account, err := client.GetAccount()
-	if err != nil {
-		return nil, err
-	}
-	client.accountNumber = account.GetAccountNumber()
-
 	client.setDenom(denom)
 	if err != nil {
 		return nil, err
