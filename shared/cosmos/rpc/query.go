@@ -181,7 +181,7 @@ func retry(f func() (interface{}, error)) (interface{}, error) {
 		}
 		return result, err
 	}
-	return nil, fmt.Errorf("reach retry limit. err: %s", err)
+	return nil, fmt.Errorf("err: %s", err)
 }
 
 func isConnectionError(err error) bool {

@@ -1,4 +1,5 @@
 atomDenom = "stake" 
+coinGeckoApi = "https://api.coingecko.com/api/v3/simple/price" 
 coinMarketApi = "https://web-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest" 
 dotTypesPath = "/Users/tpkeeper/gowork/stafi/fee-station/network/polkadot.json" 
 ksmTypesPath = "/Users/tpkeeper/gowork/stafi/fee-station/network/kusama.json" 
@@ -8,7 +9,7 @@ taskTicker = 10 # seconds
 [endpoint]
 atom = "http://127.0.0.1:26657"
 dot = "ws://127.0.0.1:9944"
-eth = "https://ropsten.infura.io/v3/xxxxx"
+eth = "https://ropsten.infura.io/v3/xxx"
 ksm = ""
 
 [db]

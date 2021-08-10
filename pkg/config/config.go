@@ -18,6 +18,7 @@ type Config struct {
 	DotTypesPath  string
 	KsmTypesPath  string
 	CoinMarketApi string
+	CoinGeckoApi  string
 	Endpoint      Endpoint
 	// payer
 	KeystorePath string

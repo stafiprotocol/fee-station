@@ -17,8 +17,7 @@ import (
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 )
 
-var batchNumberLimit = 200
-var minReserveValue = big.NewInt(10e12)
+var minReserveValue = big.NewInt(1e12)
 
 func CheckPayInfo(db *db.WrapDb, fisEndpoint, swapLimit string, key *signature.KeyringPair) error {
 	swapInfoList, err := dao_station.GetSwapInfoListByState(db, utils.SwapStateVerifyTxOk)
