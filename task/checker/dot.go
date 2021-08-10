@@ -1,7 +1,6 @@
 package task
 
 import (
-	"errors"
 	dao_station "fee-station/dao/station"
 	"fee-station/pkg/db"
 	"fee-station/pkg/utils"
@@ -114,13 +113,23 @@ func TransferVerifySubstrate(gc *substrate.GsrpcClient, sc *substrate.SarpcClien
 
 	if blkNum > final {
 		logrus.Info("TransferVerify: block hash not finalized, waiting", "blockHash", bh, "symbol", swapInfo.Symbol)
-		time.Sleep(10 * BlockRetryInterval)
-		final, err = gc.GetFinalizedBlockNumber()
-		if err != nil {
-			return 0, err
-		}
-		if blkNum > final {
-			return 0, errors.New("block number not finalized")
+		retry := 0
+		for {
+			if retry > BlockRetryLimit {
+				return 0, fmt.Errorf("wait finalized block number reach retry limit")
+			}
+			final, err = gc.GetFinalizedBlockNumber()
+			if err != nil {
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue
+			}
+			if blkNum > final {
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue
+			}
+			break
 		}
 	}
 

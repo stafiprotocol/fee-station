@@ -49,10 +49,21 @@ func CheckEthTx(db *db.WrapDb, ethEndpoint string) error {
 	}
 
 	for _, swapInfo := range swapInfoList {
-		status, err := TransferVerifyEth(client, swapInfo)
-		if err != nil {
-			logrus.Errorf("eth TransferVerify failed: %s", err)
-			return err
+		var status uint8
+		retry := 0
+		var err error
+		for {
+			if retry > 10 {
+				return err
+			}
+			status, err = TransferVerifyEth(client, swapInfo)
+			if err != nil {
+				logrus.Errorf("eth TransferVerify failed: %s", err)
+				retry++
+				time.Sleep(BlockRetryInterval)
+				continue
+			}
+			break
 		}
 		swapInfo.State = status
 		err = dao_station.UpOrInSwapInfo(db, swapInfo)
@@ -66,6 +77,31 @@ func CheckEthTx(db *db.WrapDb, ethEndpoint string) error {
 }
 
 func TransferVerifyEth(client *ethclient.Client, swapInfo *dao_station.SwapInfo) (uint8, error) {
+	block, err := client.BlockByHash(context.Background(), common.HexToHash(swapInfo.Blockhash))
+	if err != nil && err != ethereum.NotFound {
+		return 0, err
+	}
+	if err != nil && err == ethereum.NotFound {
+		return utils.SwapStateBlockHashFailed, nil
+	}
+
+	swapNumber := block.NumberU64()
+	// wait 3 block
+	retry := 0
+	for {
+		if retry > BlockRetryLimit {
+			return 0, fmt.Errorf("wait 3 block,reach retry limit")
+		}
+		latestNumber, err := client.BlockNumber(context.Background())
+		if err == nil && latestNumber > swapNumber+3 {
+			break
+		} else {
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+	}
+
 	inAmountDeci, err := decimal.NewFromString(swapInfo.InAmount)
 	if err != nil {
 		return 0, err
