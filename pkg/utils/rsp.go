@@ -28,9 +28,9 @@ func Ok(c *gin.Context, msg string, data interface{}) {
 	})
 }
 
-func Err(c *gin.Context, msg string) {
+func Err(c *gin.Context, status, msg string) {
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "80001",
+		"status":  status,
 		"message": msg,
 		"data":    struct{}{},
 	})

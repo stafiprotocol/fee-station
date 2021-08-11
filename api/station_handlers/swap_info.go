@@ -49,54 +49,54 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	req := ReqSwapInfo{}
 	err := c.Bind(&req)
 	if err != nil {
-		utils.Err(c, err.Error())
+		utils.Err(c, codeParamParseErr, err.Error())
 		logrus.Errorf("bind err %v", err)
 		return
 	}
 	//check symbol
 	if !utils.SymbolValid(req.Symbol) {
-		utils.Err(c, "symbol unsupport")
+		utils.Err(c, codeSymbolErr, "symbol unsupport")
 		return
 	}
 	//check 0x prefix param
 	var stafiAddressBytes []byte
 	if stafiAddressBytes, err = hexutil.Decode(req.StafiAddress); err != nil {
-		utils.Err(c, "stafiAddress format err")
+		utils.Err(c, codeStafiAddressErr, "stafiAddress format err")
 		return
 	}
 	if len(stafiAddressBytes) != 32 {
-		utils.Err(c, "stafiAddress err")
+		utils.Err(c, codeStafiAddressErr, "stafiAddress err")
 		return
 	}
 	if _, err := hexutil.Decode(req.Blockhash); err != nil {
-		utils.Err(c, "blockHash format err")
+		utils.Err(c, codeBlockHashErr, "blockHash format err")
 		return
 	}
 	if _, err := hexutil.Decode(req.Txhash); err != nil {
-		utils.Err(c, "txHash format err")
+		utils.Err(c, codeTxHashErr, "txHash format err")
 		return
 	}
 
 	var sigBytes []byte
 	var pubkeyBytes []byte
 	if sigBytes, err = hexutil.Decode(req.Signature); req.Symbol != utils.SymbolAtom && err != nil {
-		utils.Err(c, "signature format err")
+		utils.Err(c, codeSignatureErr, "signature format err")
 		return
 	}
 	if pubkeyBytes, err = hexutil.Decode(req.Pubkey); err != nil {
-		utils.Err(c, "pubkey format err")
+		utils.Err(c, codePubkeyErr, "pubkey format err")
 		return
 	}
 
 	//check pool address
 	poolAddr, err := dao_station.GetPoolAddressBySymbol(h.db, req.Symbol)
 	if err != nil {
-		utils.Err(c, "get pool address failed")
+		utils.Err(c, codeInternalErr, "get pool address failed")
 		logrus.Errorf("dao_station.GetPoolAddressBySymbol err %v", err)
 		return
 	}
 	if !strings.EqualFold(poolAddr.PoolAddress, req.PoolAddress) {
-		utils.Err(c, "pool address not right")
+		utils.Err(c, codePoolAddressErr, "pool address not right")
 		logrus.Errorf("pool address not right:req %s,db:%s", req.PoolAddress, poolAddr.PoolAddress)
 		return
 	}
@@ -105,12 +105,12 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	swapInfo, err := dao_station.GetSwapInfoBySymbolBlkTx(
 		h.db, req.Symbol, strings.ToLower(req.Blockhash), strings.ToLower(req.Txhash))
 	if err != nil && err != gorm.ErrRecordNotFound {
-		utils.Err(c, err.Error())
+		utils.Err(c, codeInternalErr, err.Error())
 		logrus.Errorf("GetSwapInfoBySymbolBlkTx err %v", err)
 		return
 	}
 	if err == nil {
-		utils.Err(c, "duplicate swap info")
+		utils.Err(c, codeTxDuplicateErr, "duplicate swap info")
 		logrus.Errorf("duplicate swap info, txhash:", req.Txhash)
 		return
 	}
@@ -120,14 +120,14 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	case utils.SymbolDot, utils.SymbolKsm:
 		ok := utils.VerifiySigsSr25519(sigBytes, pubkeyBytes, stafiAddressBytes)
 		if !ok {
-			utils.Err(c, "signature not right")
+			utils.Err(c, codeSignatureErr, "signature not right")
 			logrus.Errorf("utils.VerifySigsSecp256 failed, stafi address: %s", req.StafiAddress)
 			return
 		}
 	case utils.SymbolEth:
 		ok := utils.VerifySigsEth(sigBytes, stafiAddressBytes, common.BytesToAddress(pubkeyBytes))
 		if !ok {
-			utils.Err(c, "signature not right")
+			utils.Err(c, codeSignatureErr, "signature not right")
 			logrus.Errorf("utils.VerifySigsEth failed, stafi address: %s", req.StafiAddress)
 			return
 		}
@@ -135,30 +135,30 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	//get fis price
 	fisPrice, err := dao_station.GetTokenPriceBySymbol(h.db, utils.SymbolFis)
 	if err != nil {
-		utils.Err(c, err.Error())
+		utils.Err(c, codeTokenPriceErr, err.Error())
 		return
 	}
 	//check old price
 	duration := int(time.Now().Unix()) - fisPrice.UpdatedAt
 	if duration > 60*60 {
-		utils.Err(c, "price too old")
+		utils.Err(c, codeTokenPriceErr, "price too old")
 		return
 	}
 
 	fisPriceDeci, err := decimal.NewFromString(fisPrice.Price)
 	if err != nil {
-		utils.Err(c, err.Error())
+		utils.Err(c, codeTokenPriceErr, err.Error())
 		return
 	}
 	//get symbol price
 	symbolPrice, err := dao_station.GetTokenPriceBySymbol(h.db, req.Symbol)
 	if err != nil {
-		utils.Err(c, err.Error())
+		utils.Err(c, codeTokenPriceErr, err.Error())
 		return
 	}
 	symbolPriceDeci, err := decimal.NewFromString(symbolPrice.Price)
 	if err != nil {
-		utils.Err(c, err.Error())
+		utils.Err(c, codeTokenPriceErr, err.Error())
 		return
 	}
 	//swap rate
@@ -186,7 +186,7 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	//in amount
 	inAmountDeci, err := decimal.NewFromString(req.InAmount)
 	if err != nil {
-		utils.Err(c, err.Error())
+		utils.Err(c, codeInAmountFormatErr, err.Error())
 		return
 	}
 	//out amount
@@ -196,7 +196,7 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 		outAmount = swapMaxLimitDeci
 	}
 	if outAmount.Cmp(swapMinLimitDeci) < 0 {
-		utils.Err(c, "out amount less than min limit")
+		utils.Err(c, codeMinLimitErr, "out amount less than min limit")
 		return
 	}
 
@@ -204,11 +204,11 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	minOutAmountDeci, err := decimal.NewFromString(req.MinOutAmount)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,minOutAmount: %s err %s", req.MinOutAmount, err)
-		utils.Err(c, err.Error())
+		utils.Err(c, codeMinOutAmountFormatErr, err.Error())
 		return
 	}
 	if outAmount.Cmp(minOutAmountDeci) < 0 {
-		utils.Err(c, "real out amount < min out amount")
+		utils.Err(c, codePriceSlideErr, "real out amount < min out amount")
 		return
 	}
 
@@ -228,7 +228,7 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	//update db
 	err = dao_station.UpOrInSwapInfo(h.db, swapInfo)
 	if err != nil {
-		utils.Err(c, err.Error())
+		utils.Err(c, codeInternalErr, err.Error())
 		logrus.Errorf("UpOrInSwapInfo err %v", err)
 		return
 	}
@@ -255,23 +255,28 @@ func (h *Handler) HandleGetSwapInfo(c *gin.Context) {
 	txHash := c.Query("txHash")
 	//check param
 	if !utils.SymbolValid(symbol) {
-		utils.Err(c, "symbol unsupport")
+		utils.Err(c, codeSymbolErr, "symbol unsupport")
 		return
 	}
 	if _, err := hexutil.Decode(blockHash); err != nil {
-		utils.Err(c, "blockHash format err")
+		utils.Err(c, codeBlockHashErr, "blockHash format err")
 		return
 	}
 	if _, err := hexutil.Decode(txHash); err != nil {
-		utils.Err(c, "txHash format err")
+		utils.Err(c, codeBlockHashErr, "txHash format err")
 		return
 	}
 
 	swapInfo, err := dao_station.GetSwapInfoBySymbolBlkTx(h.db, symbol, strings.ToLower(blockHash), strings.ToLower(txHash))
-	if err != nil {
-		utils.Err(c, err.Error())
+	if err != nil && err != gorm.ErrRecordNotFound {
+		utils.Err(c, codeInternalErr, err.Error())
 		return
 	}
+	if err != nil && err == gorm.ErrRecordNotFound {
+		utils.Err(c, codeSwapInfoNotExistErr, err.Error())
+		return
+	}
+
 	rsp := RspSwapInfo{
 		SwapStatus: swapInfo.State,
 	}

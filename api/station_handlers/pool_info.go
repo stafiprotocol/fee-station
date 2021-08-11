@@ -30,7 +30,7 @@ type RspPoolInfo struct {
 func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 	list, err := dao_station.GetPoolAddressList(h.db)
 	if err != nil {
-		utils.Err(c, err.Error())
+		utils.Err(c, codeInternalErr, err.Error())
 		return
 	}
 	swapRateStr := h.cache[utils.SwapRateKey]
@@ -61,12 +61,12 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 	//get fis price
 	fisPrice, err := dao_station.GetTokenPriceBySymbol(h.db, utils.SymbolFis)
 	if err != nil {
-		utils.Err(c, err.Error())
+		utils.Err(c, codeTokenPriceErr, err.Error())
 		return
 	}
 	fisPriceDeci, err := decimal.NewFromString(fisPrice.Price)
 	if err != nil {
-		utils.Err(c, err.Error())
+		utils.Err(c, codeTokenPriceErr, err.Error())
 		return
 	}
 
@@ -74,12 +74,12 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 		//get symbol price
 		symbolPrice, err := dao_station.GetTokenPriceBySymbol(h.db, l.Symbol)
 		if err != nil {
-			utils.Err(c, err.Error())
+			utils.Err(c, codeTokenPriceErr, err.Error())
 			return
 		}
 		symbolPriceDeci, err := decimal.NewFromString(symbolPrice.Price)
 		if err != nil {
-			utils.Err(c, err.Error())
+			utils.Err(c, codeTokenPriceErr, err.Error())
 			return
 		}
 		//cal real swap rate
