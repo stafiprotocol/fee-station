@@ -4,7 +4,7 @@
 ## 0. status code
 
 ```go
-    codeSuccess               = "80000"
+	codeSuccess               = "80000"
 	codeParamParseErr         = "80001"
 	codeSymbolErr             = "80002"
 	codeStafiAddressErr       = "80003"
