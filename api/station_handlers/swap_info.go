@@ -15,6 +15,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var priceExpiredSeconds = 60 * 60 * 24 * 3 // 3 days
+
 var defaultSwapMaxLimitDeci = decimal.NewFromBigInt(big.NewInt(100), 12) //default 100e12
 var defaultSwapMinLimitDeci = decimal.NewFromBigInt(big.NewInt(1), 12)   //default 1e12
 var defaultSwapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 6)        //default 1e6
@@ -140,7 +142,7 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	}
 	//check old price
 	duration := int(time.Now().Unix()) - fisPrice.UpdatedAt
-	if duration > 60*60 {
+	if duration > priceExpiredSeconds {
 		utils.Err(c, codeTokenPriceErr, "price too old")
 		return
 	}
