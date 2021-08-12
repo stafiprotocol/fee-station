@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/JFJun/go-substrate-crypto/ss58"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/gin-gonic/gin"
@@ -70,6 +71,13 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 		utils.Err(c, codeStafiAddressErr, "stafiAddress err")
 		return
 	}
+	stafiAddressStr, err := ss58.EncodeByPubHex(req.StafiAddress, ss58.StafiPrefix)
+	if err != nil {
+		utils.Err(c, codeStafiAddressErr, err.Error())
+		return
+	}
+	stafiAddessUtf8Bytes := []byte(stafiAddressStr)
+
 	if _, err := hexutil.Decode(req.Blockhash); err != nil {
 		utils.Err(c, codeBlockHashErr, "blockHash format err")
 		return
@@ -127,7 +135,7 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 			return
 		}
 	case utils.SymbolEth:
-		ok := utils.VerifySigsEth(sigBytes, stafiAddressBytes, common.BytesToAddress(pubkeyBytes))
+		ok := utils.VerifySigsEth(sigBytes, stafiAddessUtf8Bytes, common.BytesToAddress(pubkeyBytes))
 		if !ok {
 			utils.Err(c, codeSignatureErr, "signature not right")
 			logrus.Errorf("utils.VerifySigsEth failed, stafi address: %s", req.StafiAddress)
