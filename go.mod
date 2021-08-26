@@ -17,7 +17,7 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/huandu/xstrings v1.3.2
 	github.com/itering/scale.go v1.0.66
-	github.com/itering/substrate-api-rpc v0.3.5
+	github.com/itering/substrate-api-rpc v0.4.0
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
@@ -33,10 +33,8 @@ require (
 	github.com/tebeka/strftime v0.1.5 // indirect
 	github.com/tendermint/tendermint v0.34.11
 	github.com/urfave/cli/v2 v2.3.0
-	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
-	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
+	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
-	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gorm.io/driver/mysql v1.0.3
 	gorm.io/gorm v1.21.12
 )

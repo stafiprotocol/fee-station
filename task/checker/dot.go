@@ -134,6 +134,10 @@ func TransferVerifySubstrate(gc *substrate.GsrpcClient, sc *substrate.SarpcClien
 	}
 
 	exts, err := sc.GetExtrinsics(bh)
+	if err != nil && strings.Contains(err.Error(), "NotInFinalizedChain") {
+		logrus.Warn("TransferVerify: get extrinsics error", "err", err, "blockHash", bh)
+		return utils.SwapStateBlockHashFailed, nil
+	}
 	if err != nil {
 		logrus.Warn("TransferVerify: get extrinsics error", "err", err, "blockHash", bh)
 		return 0, err

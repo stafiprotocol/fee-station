@@ -150,7 +150,11 @@ func (sc *SarpcClient) UpdateMeta(blockHash string) error {
 	if err := sc.sendWsRequest(nil, v, rpc.ChainGetRuntimeVersion(wsId, blockHash)); err != nil {
 		return err
 	}
-
+	// fmt.Println(fmt.Errorf("%+v", v.Error))
+	// fmt.Println(fmt.Errorf("%+v", v.Result))
+	if v.Error != nil {
+		return fmt.Errorf("%+v", v.Error)
+	}
 	r := v.ToRuntimeVersion()
 	if r == nil {
 		return fmt.Errorf("runtime version nil")
