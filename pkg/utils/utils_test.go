@@ -56,15 +56,15 @@ func TestVerifySigsEth(t *testing.T) {
 }
 
 func TestVerifySigs25519(t *testing.T) {
-	sigs, err := hexutil.Decode("0xe0c9b0991c7dfce6a8d62aebb06a1e8e6da0fe95729464fc4fcdeb8a4f2e631f77090c56f27d544670de47d582e7dcd5ec45bf6b678bb4df37c7644e91a61982")
+	sigs, err := hexutil.Decode("0xf47b28366ad87a65a802d596533d33f869fff163bb7582fe5c86ad3e0151950121700ba862869ffa482b9d74955785fbe2c5075619926ec24f7eda9d53d40681")
 	if err != nil {
 		t.Fatal(err)
 	}
-	msg, err := hexutil.Decode("0x74834811c60880d0267933e31c253e937e14854f52ecdd1f25d26bdc191e2d10")
+	msg, err := hexutil.Decode("0xcca4cef73a88bcc6b1ef7087393f5ca226ce795bf20b5868d140690c7d419156")
 	if err != nil {
 		t.Fatal(err)
 	}
-	pubkey, err := hexutil.Decode("0x74834811c60880d0267933e31c253e937e14854f52ecdd1f25d26bdc191e2d10")
+	pubkey, err := hexutil.Decode("0xcca4cef73a88bcc6b1ef7087393f5ca226ce795bf20b5868d140690c7d419156")
 	if err != nil {
 		t.Fatal(err)
 	}

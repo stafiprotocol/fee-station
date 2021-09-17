@@ -55,7 +55,10 @@ func VerifySigsEthPersonal(sigs []byte, message string, address common.Address) 
 
 var substrateSigningCtx = []byte("substrate")
 
+
+//only for pokadot web3.js
 func VerifiySigsSr25519(sigs, pubkey, message []byte) bool {
+	message = append(append([]byte("<Bytes>"), message...), []byte("</Bytes>")...)
 	verifyTranscript := schnorrkel.NewSigningContext(substrateSigningCtx, message)
 	var usePubkey [32]byte
 	copy(usePubkey[:], pubkey)
