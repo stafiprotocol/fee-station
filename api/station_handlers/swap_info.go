@@ -1,6 +1,7 @@
 package station_handlers
 
 import (
+	"encoding/json"
 	dao_station "fee-station/dao/station"
 	"fee-station/pkg/utils"
 	"math/big"
@@ -56,6 +57,9 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 		logrus.Errorf("bind err %v", err)
 		return
 	}
+	reqBytes, _ := json.Marshal(req)
+	logrus.Infof("req parm:\n %s", string(reqBytes))
+
 	//check symbol
 	if !utils.SymbolValid(req.Symbol) {
 		utils.Err(c, codeSymbolErr, "symbol unsupport")
