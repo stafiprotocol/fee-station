@@ -16,7 +16,7 @@ require (
 	github.com/go-openapi/spec v0.20.0 // indirect
 	github.com/gorilla/websocket v1.4.2
 	github.com/huandu/xstrings v1.3.2
-	github.com/itering/scale.go v1.0.66
+	github.com/itering/scale.go v1.1.21
 	github.com/itering/substrate-api-rpc v0.4.0
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
@@ -26,7 +26,7 @@ require (
 	github.com/shopspring/decimal v1.2.0
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stafiprotocol/chainbridge v0.0.0-20210805135756-9c70218ebc01
-	github.com/stafiprotocol/go-substrate-rpc-client v1.1.0
+	github.com/stafiprotocol/go-substrate-rpc-client v1.1.3
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.7.0

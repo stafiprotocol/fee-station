@@ -12,8 +12,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"fee-station/shared/substrate/types"
 	"github.com/huandu/xstrings"
+	scale "github.com/itering/scale.go"
 	"github.com/itering/scale.go/utiles"
 	"github.com/itering/scale.go/utiles/crypto/ethereum"
 	"github.com/itering/scale.go/utiles/uint128"
@@ -341,9 +341,9 @@ func (s *BoxProposal) Process() {
 		"call_name":   callModule.Call.Name,
 		"call_module": callModule.Module.Name,
 	}
-	var param []types.ExtrinsicParam
+	var param []scale.ExtrinsicParam
 	for _, arg := range callModule.Call.Args {
-		param = append(param, types.ExtrinsicParam{
+		param = append(param, scale.ExtrinsicParam{
 			Name:  arg.Name,
 			Type:  arg.Type,
 			Value: s.ProcessAndUpdateData(arg.Type),
@@ -612,9 +612,9 @@ func (s *Call) Process() {
 		"call_name":   callModule.Call.Name,
 		"call_module": callModule.Module.Name,
 	}
-	var param []types.ExtrinsicParam
+	var param []scale.ExtrinsicParam
 	for _, arg := range callModule.Call.Args {
-		param = append(param, types.ExtrinsicParam{
+		param = append(param, scale.ExtrinsicParam{
 			Name:  arg.Name,
 			Type:  arg.Type,
 			Value: s.ProcessAndUpdateData(arg.Type),

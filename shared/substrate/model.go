@@ -2,8 +2,7 @@ package substrate
 
 import (
 	"errors"
-	subTypes "fee-station/shared/substrate/types"
-	scalecodec "github.com/itering/scale.go"
+	scale "github.com/itering/scale.go"
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 )
 
@@ -21,9 +20,9 @@ var (
 )
 
 type ChainEvent struct {
-	ModuleId string                  `json:"module_id" `
-	EventId  string                  `json:"event_id" `
-	Params   []scalecodec.EventParam `json:"params"`
+	ModuleId string             `json:"module_id" `
+	EventId  string             `json:"event_id" `
+	Params   []scale.EventParam `json:"params"`
 }
 
 type Transaction struct {
@@ -31,7 +30,7 @@ type Transaction struct {
 	CallModuleName string
 	CallName       string
 	Address        interface{}
-	Params         []subTypes.ExtrinsicParam
+	Params         []scale.ExtrinsicParam
 }
 
 type Receive struct {

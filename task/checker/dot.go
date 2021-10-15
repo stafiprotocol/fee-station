@@ -171,7 +171,7 @@ func TransferVerifySubstrate(gc *substrate.GsrpcClient, sc *substrate.SarpcClien
 
 		for _, p := range ext.Params {
 			logrus.Info("TransferVerify", "name", p.Name, "type", p.Type)
-			if p.Name == substrate.ParamDest && p.Type == substrate.ParamDestType {
+			if p.Name == substrate.ParamDest {
 				logrus.Debug("cmp dest", "pool", swapInfo.PoolAddress, "dest", p.Value)
 
 				dest, ok := p.Value.(string)
@@ -199,7 +199,7 @@ func TransferVerifySubstrate(gc *substrate.GsrpcClient, sc *substrate.SarpcClien
 						return utils.SwapStatePoolAddressFailed, nil
 					}
 				}
-			} else if p.Name == substrate.ParamValue && p.Type == substrate.ParamValueType {
+			} else if p.Name == substrate.ParamValue {
 				logrus.Info("cmp amount", "amount", swapInfo.InAmount, "paramAmount", p.Value)
 				if fmt.Sprint(swapInfo.InAmount) != fmt.Sprint(p.Value) {
 					return utils.SwapStateAmountFailed, nil
@@ -215,7 +215,3 @@ func TransferVerifySubstrate(gc *substrate.GsrpcClient, sc *substrate.SarpcClien
 
 	return utils.SwapStateTxHashFailed, nil
 }
-
-// 222
-// 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a488f0a
-// 0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48

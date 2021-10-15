@@ -7,12 +7,13 @@ import (
 	"io/ioutil"
 	"time"
 
-	"fee-station/shared/substrate/types/polkadot"
 	"fee-station/shared/substrate/types/stafi"
 	wbskt "fee-station/shared/substrate/websocket"
 
 	"github.com/gorilla/websocket"
+	scale "github.com/itering/scale.go"
 	"github.com/itering/scale.go/source"
+	scaleTypes "github.com/itering/scale.go/types"
 	"github.com/itering/scale.go/utiles"
 	"github.com/itering/substrate-api-rpc/pkg/recws"
 	"github.com/itering/substrate-api-rpc/rpc"
@@ -39,7 +40,7 @@ type SarpcClient struct {
 var (
 	metaDecoders = map[string]interface{}{
 		ChainTypeStafi:    &stafi.MetadataDecoder{},
-		ChainTypePolkadot: &polkadot.MetadataDecoder{},
+		ChainTypePolkadot: &scale.MetadataDecoder{},
 	}
 )
 
@@ -91,8 +92,8 @@ func (sc *SarpcClient) regCustomTypes() {
 		stafi.RuntimeType{}.Reg()
 		stafi.RegCustomTypes(source.LoadTypeRegistry(content))
 	case ChainTypePolkadot:
-		polkadot.RuntimeType{}.Reg()
-		polkadot.RegCustomTypes(source.LoadTypeRegistry(content))
+		scaleTypes.RuntimeType{}.Reg()
+		scaleTypes.RegCustomTypes(source.LoadTypeRegistry(content))
 	default:
 		panic("chainType not supported")
 	}
@@ -180,7 +181,7 @@ func (sc *SarpcClient) UpdateMeta(blockHash string) error {
 				return err
 			}
 		case ChainTypePolkadot:
-			md, _ := sc.metaDecoder.(*polkadot.MetadataDecoder)
+			md, _ := sc.metaDecoder.(*scale.MetadataDecoder)
 			md.Init(utiles.HexToBytes(metaRaw))
 			if err := md.Process(); err != nil {
 				return err
@@ -235,17 +236,24 @@ func (sc *SarpcClient) GetExtrinsics(blockHash string) ([]*Transaction, error) {
 		}
 		return exts, nil
 	case ChainTypePolkadot:
-		e := new(polkadot.ExtrinsicDecoder)
-		md, _ := sc.metaDecoder.(*polkadot.MetadataDecoder)
-		option := polkadot.ScaleDecoderOption{Metadata: &md.Metadata, Spec: sc.currentSpecVersion}
+		e := new(scale.ExtrinsicDecoder)
+		md, _ := sc.metaDecoder.(*scale.MetadataDecoder)
+
+		option := scaleTypes.ScaleDecoderOption{Metadata: &md.Metadata, Spec: sc.currentSpecVersion}
 		for _, raw := range blk.Extrinsics {
-			e.Init(polkadot.ScaleBytes{Data: util.HexToBytes(raw)}, &option)
+			e.Init(scaleTypes.ScaleBytes{Data: util.HexToBytes(raw)}, &option)
 			e.Process()
+
+			call, exist := e.Metadata.CallIndex[e.CallIndex]
+			if !exist {
+				return nil, fmt.Errorf("callIndex: %s not exist metaData", e.CallIndex)
+			}
+
 			if e.ExtrinsicHash != "" && e.ContainsTransaction {
 				ext := &Transaction{
 					ExtrinsicHash:  e.ExtrinsicHash,
-					CallModuleName: e.CallModule.Name,
-					CallName:       e.Call.Name,
+					CallModuleName: call.Module.Name,
+					CallName:       call.Call.Name,
 					Address:        e.Address,
 					Params:         e.Params,
 				}
@@ -304,10 +312,11 @@ func (sc *SarpcClient) GetChainEvents(blockHash string) ([]*ChainEvent, error) {
 			return nil, err
 		}
 	case ChainTypePolkadot:
-		e := polkadot.EventsDecoder{}
-		md, _ := sc.metaDecoder.(*polkadot.MetadataDecoder)
-		option := polkadot.ScaleDecoderOption{Metadata: &md.Metadata}
-		e.Init(polkadot.ScaleBytes{Data: util.HexToBytes(eventRaw)}, &option)
+		md, _ := sc.metaDecoder.(*scale.MetadataDecoder)
+
+		option := scaleTypes.ScaleDecoderOption{Metadata: &md.Metadata}
+		e := scale.EventsDecoder{}
+		e.Init(scaleTypes.ScaleBytes{Data: util.HexToBytes(eventRaw)}, &option)
 		e.Process()
 		b, err := json.Marshal(e.Value)
 		if err != nil {
