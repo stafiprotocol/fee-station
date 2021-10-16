@@ -3,14 +3,20 @@ package substrate_test
 import (
 	"fee-station/shared/substrate"
 	"testing"
+	"time"
 
 	"github.com/stafiprotocol/go-substrate-rpc-client/types"
 )
 
-func TestGetEvent(t *testing.T) {
-	endpoint := "wss://polkadot-rpc3.stafi.io"
+func TestGetSomeEvents(t *testing.T) {
+	// endpoint := "wss://polkadot-rpc3.stafi.io"
+	endpoint := "wss://kusama-rpc.polkadot.io"
 	// endpoint ="wss://mainnet-rpc.stafi.io"
 	gc, err := substrate.NewGsrpcClient(endpoint, substrate.AddressTypeAccountId, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sc, err := substrate.NewSarpcClient(substrate.ChainTypePolkadot, endpoint, "/Users/tpkeeper/gowork/stafi/fee-station/network/kusama.json")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -20,7 +26,79 @@ func TestGetEvent(t *testing.T) {
 	}
 	t.Log("finalNumber:", finalNumber)
 
-	hash, err := types.NewHashFromHexString("0x5487b78630c24312b56953fd493e0c2900e85cc7a91fd61c8c214e9f7fedc66c")
+	for i := finalNumber; i > 0; i++ {
+		t.Log("now deal number", i)
+		var hash types.Hash
+		for {
+
+			hashStr, err := sc.GetBlockHash(i)
+			if err != nil {
+				t.Log(err)
+				time.Sleep(time.Second * 1)
+				continue
+			}
+
+			hash, err = types.NewHashFromHexString(hashStr)
+			if err != nil {
+				t.Log(err)
+				time.Sleep(time.Second * 1)
+				continue
+			}
+			break
+		}
+
+		number, err := gc.GetBlockNumber(hash)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		t.Log("number:", number)
+
+		extrinsics, err := sc.GetExtrinsics(hash.Hex())
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, n := range extrinsics {
+			t.Log(n.Address, n.CallModuleName, n.CallName, n.Params)
+		}
+
+		event, err := sc.GetChainEvents(hash.Hex())
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		for _, e := range event {
+			t.Log(e.EventId, e.ModuleId, e.Params)
+		}
+	}
+
+}
+
+func TestGetEvent(t *testing.T) {
+	// endpoint := "wss://polkadot-rpc3.stafi.io"
+	endpoint := "wss://kusama-rpc.polkadot.io"
+	// endpoint ="wss://mainnet-rpc.stafi.io"
+	gc, err := substrate.NewGsrpcClient(endpoint, substrate.AddressTypeAccountId, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sc, err := substrate.NewSarpcClient(substrate.ChainTypePolkadot, endpoint, "/Users/tpkeeper/gowork/stafi/fee-station/network/kusama.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	finalNumber, err := gc.GetFinalizedBlockNumber()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log("finalNumber:", finalNumber)
+	i := uint64(9674430)
+	t.Log("now deal number", i)
+	hashStr, err := sc.GetBlockHash(i)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	hash, err := types.NewHashFromHexString(hashStr)
 	if err != nil {
 		t.Fatal(hash)
 	}
@@ -31,16 +109,21 @@ func TestGetEvent(t *testing.T) {
 
 	t.Log("number:", number)
 
-	sc, err := substrate.NewSarpcClient(substrate.ChainTypePolkadot, endpoint, "/Users/tpkeeper/gowork/stafi/fee-station/network/polkadot.json")
+	extrinsics, err := sc.GetExtrinsics(hash.Hex())
 	if err != nil {
 		t.Fatal(err)
 	}
-	need, err := sc.GetExtrinsics("0x5487b78630c24312b56953fd493e0c2900e85cc7a91fd61c8c214e9f7fedc66c")
-	if err != nil {
-		t.Log(err)
-	}
-	for _, n := range need {
+	for _, n := range extrinsics {
 		t.Log(n.Address, n.CallModuleName, n.CallName, n.Params)
+	}
+
+	event, err := sc.GetChainEvents(hash.Hex())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, e := range event {
+		t.Log(e.EventId, e.ModuleId, e.Params)
 	}
 
 }
