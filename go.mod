@@ -16,14 +16,14 @@ require (
 	github.com/go-openapi/spec v0.20.0 // indirect
 	github.com/gorilla/websocket v1.4.2
 	github.com/huandu/xstrings v1.3.2
-	github.com/itering/scale.go v1.1.22
+	github.com/itering/scale.go v1.1.24
 	github.com/itering/substrate-api-rpc v0.4.0
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/lestrrat-go/strftime v1.0.3 // indirect
 	github.com/satori/go.uuid v1.2.0
-	github.com/shopspring/decimal v1.3.0
+	github.com/shopspring/decimal v1.3.1
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stafiprotocol/chainbridge v0.0.0-20210805135756-9c70218ebc01
 	github.com/stafiprotocol/go-substrate-rpc-client v1.1.3
@@ -34,7 +34,7 @@ require (
 	github.com/tendermint/tendermint v0.34.11
 	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
-	golang.org/x/sys v0.0.0-20211015200801-69063c4bb744 // indirect
+	golang.org/x/sys v0.0.0-20211020174200-9d6173849985 // indirect
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
 	gorm.io/driver/mysql v1.0.3
 	gorm.io/gorm v1.21.12

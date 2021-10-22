@@ -86,14 +86,14 @@ func TransferVerifyEth(client *ethclient.Client, swapInfo *dao_station.SwapInfo)
 	}
 
 	swapNumber := block.NumberU64()
-	// wait 3 block
+	// wait 1 block
 	retry := 0
 	for {
 		if retry > BlockRetryLimit {
 			return 0, fmt.Errorf("wait 3 block,reach retry limit")
 		}
 		latestNumber, err := client.BlockNumber(context.Background())
-		if err == nil && latestNumber > swapNumber+3 {
+		if err == nil && latestNumber > swapNumber+1 {
 			break
 		} else {
 			time.Sleep(BlockRetryInterval)

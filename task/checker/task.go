@@ -13,7 +13,7 @@ import (
 const (
 	BlockRetryInterval = time.Second * 6
 	BlockRetryLimit    = 100
-	BlockConfirmNumber = int64(6)
+	BlockConfirmNumber = int64(1)
 )
 
 type Task struct {

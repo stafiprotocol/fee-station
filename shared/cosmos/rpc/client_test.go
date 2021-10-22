@@ -11,7 +11,7 @@ import (
 	"fee-station/shared/cosmos/rpc"
 	"github.com/JFJun/go-substrate-crypto/ss58"
 	"github.com/cosmos/cosmos-sdk/types"
-	xBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	// xBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/stretchr/testify/assert"
 )
@@ -54,7 +54,8 @@ func init() {
 
 	// client, err = rpc.NewClient(key, "stargate-final", "recipient", "0.04umuon", "umuon", "https://testcosmosrpc.wetez.io:443")
 	var err error
-	client, err = rpc.NewClient("umuon", "http://127.0.0.1:26657")
+	// client, err = rpc.NewClient("umuon", "http://127.0.0.1:26657")
+	client, err = rpc.NewClient("stake", "https://cosmos-rpc1.stafi.io:443")
 	if err != nil {
 		panic(err)
 	}
@@ -77,21 +78,23 @@ func TestClient_QueryTxByHash(t *testing.T) {
 }
 
 func TestGetPubKey(t *testing.T) {
-	test, _ := types.AccAddressFromBech32("cosmos12wrv225462drlz4dk3yg9hc8vavwjkmckshz7c")
-	account, _ := client.QueryAccount(test)
+	test, err := types.AccAddressFromBech32("cosmos12zhwz792d8zpxj3wmz05c7k9meea6q0xvf5y79")
+	assert.NoError(t,err)
+	account, err := client.QueryAccount(test)
+	assert.NoError(t,err)
 	t.Log(hex.EncodeToString(account.GetPubKey().Bytes()))
 
-	res, err := client.QueryTxByHash("327DA2048B6D66BCB27C0F1A6D1E407D88FE719B95A30D108B5906FD6934F7B1")
-	if err != nil {
-		t.Fatal(err)
-	}
-	msgs := res.GetTx().GetMsgs()
-	for i, _ := range msgs {
-		if msgs[i].Type() == xBankTypes.TypeMsgSend {
-			msg, _ := msgs[i].(*xBankTypes.MsgSend)
-			t.Log(msg.Amount.AmountOf("umuon").Uint64())
-		}
-	}
+	// res, err := client.QueryTxByHash("327DA2048B6D66BCB27C0F1A6D1E407D88FE719B95A30D108B5906FD6934F7B1")
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	// msgs := res.GetTx().GetMsgs()
+	// for i, _ := range msgs {
+	// 	if msgs[i].Type() == xBankTypes.TypeMsgSend {
+	// 		msg, _ := msgs[i].(*xBankTypes.MsgSend)
+	// 		t.Log(msg.Amount.AmountOf("umuon").Uint64())
+	// 	}
+	// }
 
 }
 
