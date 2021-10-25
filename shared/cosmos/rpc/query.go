@@ -169,6 +169,16 @@ func (c *Client) getAccount(height int64, addr types.AccAddress) (client.Account
 	return cc.(client.Account), nil
 }
 
+func (c *Client) GetEvents(events []string, page, limit int, orderBy string) (*types.SearchTxsResult, error) {
+	cc, err := retry(func() (interface{}, error) {
+		return xAuthClient.QueryTxsByEvents(c.clientCtx, events, page, limit, orderBy)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cc.(*types.SearchTxsResult), nil
+}
+
 //only retry func when return connection err here
 func retry(f func() (interface{}, error)) (interface{}, error) {
 	var err error

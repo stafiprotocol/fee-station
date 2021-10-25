@@ -61,10 +61,6 @@ func init() {
 	}
 }
 
-//{"height":"901192","txhash":"327DA2048B6D66BCB27C0F1A6D1E407D88FE719B95A30D108B5906FD6934F7B1","codespace":"","code":0,"data":"0A060A0473656E64","raw_log":"[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cosmos1ak3nrcmm7e4j8y7ycfc78pxl4g4lehf43vw6wu\"},{\"key\":\"sender\",\"value\":\"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf\"},{\"key\":\"amount\",\"value\":\"100umuon\"}]}]}]","logs":[{"msg_index":0,"log":"","events":[{"type":"message","attributes":[{"key":"action","value":"send"},{"key":"sender","value":"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf"},{"key":"module","value":"bank"}]},{"type":"transfer","attributes":[{"key":"recipient","value":"cosmos1ak3nrcmm7e4j8y7ycfc78pxl4g4lehf43vw6wu"},{"key":"sender","value":"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf"},{"key":"amount","value":"100umuon"}]}]}],"info":"","gas_wanted":"200000","gas_used":"51169","tx":null,"timestamp":""}
-//{"height":"903451","txhash":"0E4F8F8FF7A3B67121711DA17FBE5AE8CB25DB272DDBF7DC0E02122947266604","codespace":"","code":0,"data":"0A060A0473656E64","raw_log":"[{\"events\":[{\"type\":\"message\",\"attributes\":[{\"key\":\"action\",\"value\":\"send\"},{\"key\":\"sender\",\"value\":\"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf\"},{\"key\":\"module\",\"value\":\"bank\"}]},{\"type\":\"transfer\",\"attributes\":[{\"key\":\"recipient\",\"value\":\"cosmos1ak3nrcmm7e4j8y7ycfc78pxl4g4lehf43vw6wu\"},{\"key\":\"sender\",\"value\":\"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf\"},{\"key\":\"amount\",\"value\":\"10umuon\"}]}]}]","logs":[{"msg_index":0,"log":"","events":[{"type":"message","attributes":[{"key":"action","value":"send"},{"key":"sender","value":"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf"},{"key":"module","value":"bank"}]},{"type":"transfer","attributes":[{"key":"recipient","value":"cosmos1ak3nrcmm7e4j8y7ycfc78pxl4g4lehf43vw6wu"},{"key":"sender","value":"cosmos1cgs647rewxyzh5wu4e606kk7qyuj5f8hk20rgf"},{"key":"amount","value":"10umuon"}]}]}],"info":"","gas_wanted":"200000","gas_used":"51159","tx":null,"timestamp":""}
-//block hash 0x16E8297663210ABF6937FE4C1C139D4BACD0D27A22EFD9E3FE06B1DA8E3F7BB3
-
 func TestClient_QueryTxByHash(t *testing.T) {
 	res, err := client.QueryTxByHash("6C017062FD3F48F13B640E5FEDD59EB050B148E67EF12EC0A511442D32BD4C88")
 	t.Log(err)
@@ -79,9 +75,9 @@ func TestClient_QueryTxByHash(t *testing.T) {
 
 func TestGetPubKey(t *testing.T) {
 	test, err := types.AccAddressFromBech32("cosmos12zhwz792d8zpxj3wmz05c7k9meea6q0xvf5y79")
-	assert.NoError(t,err)
+	assert.NoError(t, err)
 	account, err := client.QueryAccount(test)
-	assert.NoError(t,err)
+	assert.NoError(t, err)
 	t.Log(hex.EncodeToString(account.GetPubKey().Bytes()))
 
 	// res, err := client.QueryTxByHash("327DA2048B6D66BCB27C0F1A6D1E407D88FE719B95A30D108B5906FD6934F7B1")
@@ -96,6 +92,16 @@ func TestGetPubKey(t *testing.T) {
 	// 	}
 	// }
 
+}
+
+func TestGetEvents(t *testing.T) {
+	events, err := client.GetEvents(
+		[]string{"transfer.recipient='cosmos1jacw22mwkaswlml3ra7w7ue4fdak33kyx9fc8x'"},
+		1, 10, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(events)
 }
 
 func TestClient_Sign(t *testing.T) {
@@ -120,7 +126,7 @@ func TestAddress(t *testing.T) {
 	t.Log(hex.EncodeToString(addrKey2.Bytes()))
 	t.Log(hex.EncodeToString(addrKey3.Bytes()))
 	t.Log(hex.EncodeToString(addrKey4.Bytes()))
-	t.Log(hex.EncodeToString(pub.Bytes()))//03651ac344ac6724a5c80b4f168fd0da5f16973430bb2597ec05f338f59f48e6cf
+	t.Log(hex.EncodeToString(pub.Bytes())) //03651ac344ac6724a5c80b4f168fd0da5f16973430bb2597ec05f338f59f48e6cf
 	//client_test.go:347: e9f6828e559dbf7dbac9a319d3b58b41abcc34a4
 	//client_test.go:348: 12c1c15c36667d017ca595b88057e792c33bfe7e
 	//client_test.go:349: 5084abedea81b254d42e5f894015d2be3853b27c
