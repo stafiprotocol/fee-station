@@ -9,5 +9,7 @@ import (
 
 func AutoMigrate(db *db.WrapDb) error {
 	return db.Set("gorm:table_options", "ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8").
-		AutoMigrate(SwapInfo{}, TokenPrice{}, PoolAddress{})
+		AutoMigrate(SwapInfo{}, TokenPrice{}, PoolAddress{},
+			FeeStationSwapInfo{}, FeeStationTokenPrice{}, FeeStationPoolAddress{},
+			FeeStationBundleAddress{}, FeeStationNativeChainTx{})
 }
