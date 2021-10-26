@@ -33,7 +33,8 @@ type Config struct {
 	Mode         string //release debug test
 	PoolAddress  PoolAddress
 	//syncer
-	SyncTxEndpoint SyncTxEndpoint
+	EtherScanApiKey string
+	SyncTxEndpoint  SyncTxEndpoint
 	//common
 	Db Db
 }

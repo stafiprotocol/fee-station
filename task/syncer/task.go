@@ -17,20 +17,22 @@ const (
 )
 
 type Task struct {
-	taskTicker     int64
-	atomDenom      string
-	stop           chan struct{}
-	syncTxEndPoint config.SyncTxEndpoint
-	db             *db.WrapDb
+	taskTicker      int64
+	atomDenom       string
+	stop            chan struct{}
+	etherScanApiKey string
+	syncTxEndPoint  config.SyncTxEndpoint
+	db              *db.WrapDb
 }
 
 func NewTask(cfg *config.Config, dao *db.WrapDb) *Task {
 	s := &Task{
-		taskTicker:     cfg.TaskTicker,
-		atomDenom:      cfg.AtomDenom,
-		stop:           make(chan struct{}),
-		syncTxEndPoint: cfg.SyncTxEndpoint,
-		db:             dao,
+		taskTicker:      cfg.TaskTicker,
+		atomDenom:       cfg.AtomDenom,
+		stop:            make(chan struct{}),
+		etherScanApiKey: cfg.EtherScanApiKey,
+		syncTxEndPoint:  cfg.SyncTxEndpoint,
+		db:              dao,
 	}
 	return s
 }
@@ -120,7 +122,7 @@ out:
 			break out
 		case <-ticker.C:
 			logrus.Infof("task SyncEthTx start -----------")
-			err := SyncEthTx(task.db, task.syncTxEndPoint.Eth)
+			err := SyncEthTx(task.db, task.syncTxEndPoint.Eth, task.etherScanApiKey)
 			if err != nil {
 				logrus.Errorf("task.SyncEthTx err %s", err)
 				utils.ShutdownRequestChannel <- struct{}{}
