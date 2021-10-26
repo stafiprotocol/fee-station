@@ -24,8 +24,11 @@ func InitRouters(db *db.WrapDb, cache map[string]string) http.Handler {
 
 	stationHandler := station_handlers.NewHandler(db, cache)
 	router.GET("/feeStation/api/v1/station/poolInfo", stationHandler.HandleGetPoolInfo)
-	router.POST("/feeStation/api/v1/station/swapInfo", stationHandler.HandlePostSwapInfo)
+	// router.POST("/feeStation/api/v1/station/swapInfo", stationHandler.HandlePostSwapInfo)
 	router.GET("/feeStation/api/v1/station/swapInfo", stationHandler.HandleGetSwapInfo)
+
+	router.POST("/feeStation/api/v1/station/bundleAddress", stationHandler.HandlePostBundleAddress)
+	router.POST("/feeStation/api/v2/station/swapInfo", stationHandler.HandlePostSwapInfoV2)
 
 	return router
 }

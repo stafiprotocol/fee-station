@@ -17,7 +17,7 @@ import (
 )
 
 func CheckEthTx(db *db.WrapDb, ethEndpoint string) error {
-	swapInfoList, err := dao_station.GetSwapInfoListBySymbolState(db, utils.SymbolEth, utils.SwapStateVerifySigs)
+	swapInfoList, err := dao_station.GetFeeStationSwapInfoListBySymbolState(db, utils.SymbolEth, utils.SwapStateVerifySigs)
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func CheckEthTx(db *db.WrapDb, ethEndpoint string) error {
 			break
 		}
 		swapInfo.State = status
-		err = dao_station.UpOrInSwapInfo(db, swapInfo)
+		err = dao_station.UpOrInFeeStationSwapInfo(db, swapInfo)
 		if err != nil {
 			logrus.Errorf("dao_station.UpOrInSwapInfo err: %s", err)
 			return err
@@ -76,7 +76,7 @@ func CheckEthTx(db *db.WrapDb, ethEndpoint string) error {
 	return nil
 }
 
-func TransferVerifyEth(client *ethclient.Client, swapInfo *dao_station.SwapInfo) (uint8, error) {
+func TransferVerifyEth(client *ethclient.Client, swapInfo *dao_station.FeeStationSwapInfo) (uint8, error) {
 	block, err := client.BlockByHash(context.Background(), common.HexToHash(swapInfo.Blockhash))
 	if err != nil && err != ethereum.NotFound {
 		return 0, err

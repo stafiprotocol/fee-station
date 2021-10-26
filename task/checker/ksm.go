@@ -12,7 +12,7 @@ import (
 )
 
 func CheckKsmTx(db *db.WrapDb, ksmEndpoint, typesPath string) error {
-	swapInfoList, err := dao_station.GetSwapInfoListBySymbolState(db, utils.SymbolKsm, utils.SwapStateVerifySigs)
+	swapInfoList, err := dao_station.GetFeeStationSwapInfoListBySymbolState(db, utils.SymbolKsm, utils.SwapStateVerifySigs)
 	if err != nil {
 		return err
 	}
@@ -59,7 +59,7 @@ func CheckKsmTx(db *db.WrapDb, ksmEndpoint, typesPath string) error {
 			return err
 		}
 		swapInfo.State = status
-		err = dao_station.UpOrInSwapInfo(db, swapInfo)
+		err = dao_station.UpOrInFeeStationSwapInfo(db, swapInfo)
 		if err != nil {
 			logrus.Errorf("dao_station.UpOrInSwapInfo err: %s", err)
 			return err

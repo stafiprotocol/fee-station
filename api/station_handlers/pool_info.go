@@ -28,7 +28,7 @@ type RspPoolInfo struct {
 // @Success 200 {object} utils.Rsp{data=RspPoolInfo}
 // @Router /v1/station/poolInfo [get]
 func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
-	list, err := dao_station.GetPoolAddressList(h.db)
+	list, err := dao_station.GetFeeStationPoolAddressList(h.db)
 	if err != nil {
 		utils.Err(c, codeInternalErr, err.Error())
 		return
@@ -59,7 +59,7 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 	}
 
 	//get fis price
-	fisPrice, err := dao_station.GetTokenPriceBySymbol(h.db, utils.SymbolFis)
+	fisPrice, err := dao_station.GetFeeStationTokenPriceBySymbol(h.db, utils.SymbolFis)
 	if err != nil {
 		utils.Err(c, codeTokenPriceErr, err.Error())
 		return
@@ -72,7 +72,7 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 
 	for _, l := range list {
 		//get symbol price
-		symbolPrice, err := dao_station.GetTokenPriceBySymbol(h.db, l.Symbol)
+		symbolPrice, err := dao_station.GetFeeStationTokenPriceBySymbol(h.db, l.Symbol)
 		if err != nil {
 			utils.Err(c, codeTokenPriceErr, err.Error())
 			return

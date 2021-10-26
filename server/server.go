@@ -80,33 +80,33 @@ func (svr *Server) ApiServer() {
 //check and init dropFlowLatestDate LedgerLatestDate
 func (svr *Server) InitOrUpdatePoolAddress() error {
 
-	atom, _ := dao_station.GetPoolAddressBySymbol(svr.db, utils.SymbolAtom)
+	atom, _ := dao_station.GetFeeStationPoolAddressBySymbol(svr.db, utils.SymbolAtom)
 	atom.Symbol = utils.SymbolAtom
 	atom.PoolAddress = svr.poolAddress.Atom
-	err := dao_station.UpOrInPoolAddress(svr.db, atom)
+	err := dao_station.UpOrInFeeStationPoolAddress(svr.db, atom)
 	if err != nil {
 		return err
 	}
-	eth, _ := dao_station.GetPoolAddressBySymbol(svr.db, utils.SymbolEth)
+	eth, _ := dao_station.GetFeeStationPoolAddressBySymbol(svr.db, utils.SymbolEth)
 	eth.Symbol = utils.SymbolEth
 	eth.PoolAddress = svr.poolAddress.Eth
-	err = dao_station.UpOrInPoolAddress(svr.db, eth)
+	err = dao_station.UpOrInFeeStationPoolAddress(svr.db, eth)
 	if err != nil {
 		return err
 	}
 
-	dot, _ := dao_station.GetPoolAddressBySymbol(svr.db, utils.SymbolDot)
+	dot, _ := dao_station.GetFeeStationPoolAddressBySymbol(svr.db, utils.SymbolDot)
 	dot.Symbol = utils.SymbolDot
 	dot.PoolAddress = svr.poolAddress.Dot
-	err = dao_station.UpOrInPoolAddress(svr.db, dot)
+	err = dao_station.UpOrInFeeStationPoolAddress(svr.db, dot)
 	if err != nil {
 		return err
 	}
 
-	ksm, _ := dao_station.GetPoolAddressBySymbol(svr.db, utils.SymbolKsm)
+	ksm, _ := dao_station.GetFeeStationPoolAddressBySymbol(svr.db, utils.SymbolKsm)
 	ksm.Symbol = utils.SymbolKsm
 	ksm.PoolAddress = svr.poolAddress.Ksm
-	err = dao_station.UpOrInPoolAddress(svr.db, ksm)
+	err = dao_station.UpOrInFeeStationPoolAddress(svr.db, ksm)
 	if err != nil {
 		return err
 	}

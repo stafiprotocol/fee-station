@@ -17,40 +17,29 @@ import (
 	"gorm.io/gorm"
 )
 
-var priceExpiredSeconds = 60 * 60 * 24 * 3 // 3 days
-
-var defaultSwapMaxLimitDeci = decimal.NewFromBigInt(big.NewInt(100), 12) //default 100e12
-var defaultSwapMinLimitDeci = decimal.NewFromBigInt(big.NewInt(1), 12)   //default 1e12
-var defaultSwapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 6)        //default 1e6
-var decimalsMap = map[string]int32{
-	utils.SymbolAtom: 6,
-	utils.SymbolDot:  10,
-	utils.SymbolKsm:  12,
-	utils.SymbolEth:  18,
+type ReqSwapInfoV2 struct {
+	StafiAddress    string `json:"stafiAddress"` //hex
+	Symbol          string `json:"symbol"`
+	Blockhash       string `json:"blockHash"` //hex
+	Txhash          string `json:"txHash"`    //hex
+	PoolAddress     string `json:"poolAddress"`
+	Signature       string `json:"signature"`    //hex
+	Pubkey          string `json:"pubkey"`       //hex format eth:address other:pubkey
+	InAmount        string `json:"inAmount"`     //decimal
+	MinOutAmount    string `json:"minOutAmount"` //decimal
+	BundleAddressId int64  `json:"bundleAddressId"`
 }
 
-type ReqSwapInfo struct {
-	StafiAddress string `json:"stafiAddress"` //hex
-	Symbol       string `json:"symbol"`
-	Blockhash    string `json:"blockHash"` //hex
-	Txhash       string `json:"txHash"`    //hex
-	PoolAddress  string `json:"poolAddress"`
-	Signature    string `json:"signature"`    //hex
-	Pubkey       string `json:"pubkey"`       //hex
-	InAmount     string `json:"inAmount"`     //decimal
-	MinOutAmount string `json:"minOutAmount"` //decimal
-}
-
-// @Summary post swap info
-// @Description post swap info
-// @Tags v1
+// @Summary post swap info v2
+// @Description post swap info v2
+// @Tags v2
 // @Accept json
 // @Produce json
-// @Param param body ReqSwapInfo true "user swap info"
+// @Param param body ReqSwapInfoV2 true "user swap info v2"
 // @Success 200 {object} utils.Rsp{}
-// @Router /v1/station/swapInfo [post]
-func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
-	req := ReqSwapInfo{}
+// @Router /v2/station/swapInfo [post]
+func (h *Handler) HandlePostSwapInfoV2(c *gin.Context) {
+	req := ReqSwapInfoV2{}
 	err := c.Bind(&req)
 	if err != nil {
 		utils.Err(c, codeParamParseErr, err.Error())
@@ -63,29 +52,35 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	//check symbol
 	if !utils.SymbolValid(req.Symbol) {
 		utils.Err(c, codeSymbolErr, "symbol unsupport")
+		logrus.Errorf("symbol unsupport: %s", req.Symbol)
 		return
 	}
 	//check 0x prefix param
 	var stafiAddressBytes []byte
 	if stafiAddressBytes, err = hexutil.Decode(req.StafiAddress); err != nil {
 		utils.Err(c, codeStafiAddressErr, "stafiAddress format err")
+		logrus.Errorf("stafiAddress format err: %s", err)
 		return
 	}
 	if len(stafiAddressBytes) != 32 {
 		utils.Err(c, codeStafiAddressErr, "stafiAddress err")
+		logrus.Errorf("stafiAddress len err")
 		return
 	}
 	stafiAddressStr, err := ss58.EncodeByPubHex(req.StafiAddress[2:], ss58.StafiPrefix)
 	if err != nil {
 		utils.Err(c, codeStafiAddressErr, err.Error())
+		logrus.Errorf("stafiAddress err %s", err)
 		return
 	}
 	if _, err := hexutil.Decode(req.Blockhash); err != nil {
 		utils.Err(c, codeBlockHashErr, "blockHash format err")
+		logrus.Errorf("blockHash format err: %s", err)
 		return
 	}
 	if _, err := hexutil.Decode(req.Txhash); err != nil {
 		utils.Err(c, codeTxHashErr, "txHash format err")
+		logrus.Errorf("txHash format err: %s", err)
 		return
 	}
 
@@ -148,29 +143,34 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	fisPrice, err := dao_station.GetFeeStationTokenPriceBySymbol(h.db, utils.SymbolFis)
 	if err != nil {
 		utils.Err(c, codeTokenPriceErr, err.Error())
+		logrus.Errorf("GetTokenPriceBySymbol %s err: %s", utils.SymbolFis, err)
 		return
 	}
 	//check old price
 	duration := int(time.Now().Unix()) - fisPrice.UpdatedAt
 	if duration > priceExpiredSeconds {
 		utils.Err(c, codeTokenPriceErr, "price too old")
+		logrus.Errorf("fis price too old")
 		return
 	}
 
 	fisPriceDeci, err := decimal.NewFromString(fisPrice.Price)
 	if err != nil {
 		utils.Err(c, codeTokenPriceErr, err.Error())
+		logrus.Errorf("decimal.NewFromString(fisPrice.Price) err: %s", err)
 		return
 	}
 	//get symbol price
 	symbolPrice, err := dao_station.GetFeeStationTokenPriceBySymbol(h.db, req.Symbol)
 	if err != nil {
 		utils.Err(c, codeTokenPriceErr, err.Error())
+		logrus.Errorf("GetTokenPriceBySymbol %s err: %s", req.Symbol, err)
 		return
 	}
 	symbolPriceDeci, err := decimal.NewFromString(symbolPrice.Price)
 	if err != nil {
 		utils.Err(c, codeTokenPriceErr, err.Error())
+		logrus.Errorf("decimal.NewFromString(symbolPrice.Price) err: %s", err)
 		return
 	}
 	//swap rate
@@ -215,12 +215,21 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	//check min out amount
 	minOutAmountDeci, err := decimal.NewFromString(req.MinOutAmount)
 	if err != nil {
-		logrus.Errorf("decimal.NewFromString,minOutAmount: %s err %s", req.MinOutAmount, err)
 		utils.Err(c, codeMinOutAmountFormatErr, err.Error())
+		logrus.Errorf("decimal.NewFromString,minOutAmount: %s err %s", req.MinOutAmount, err)
 		return
 	}
 	if outAmount.Cmp(minOutAmountDeci) < 0 {
 		utils.Err(c, codePriceSlideErr, "real out amount < min out amount")
+		logrus.Errorf("real out amount %s < min out amount %s", outAmount.String(), minOutAmountDeci.String())
+		return
+	}
+
+	//check bundleAddressId
+	_, err = dao_station.GetFeeStationBundleAddressById(h.db, req.BundleAddressId)
+	if err != nil {
+		utils.Err(c, codeBundleIdNotExistErr, "bundle id not exist")
+		logrus.Errorf("bundle id not exit")
 		return
 	}
 
@@ -236,7 +245,7 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	swapInfo.SwapRate = realSwapRateDeci.StringFixed(0)
 	swapInfo.OutAmount = outAmount.StringFixed(0)
 	swapInfo.State = utils.SwapStateVerifySigs
-
+	swapInfo.BundleAddressId = req.BundleAddressId
 	//update db
 	err = dao_station.UpOrInFeeStationSwapInfo(h.db, swapInfo)
 	if err != nil {
@@ -246,51 +255,4 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	}
 
 	utils.Ok(c, "success", struct{}{})
-}
-
-type RspSwapInfo struct {
-	SwapStatus uint8 `json:"swapStatus"`
-}
-
-// @Summary get swap info
-// @Description get swap info
-// @Tags v1
-// @Param symbol query string true "token symbol"
-// @Param blockHash query string true "block hash hex string"
-// @Param txHash query string true "tx hash hex string"
-// @Produce json
-// @Success 200 {object} utils.Rsp{data=RspSwapInfo}
-// @Router /v1/station/swapInfo [get]
-func (h *Handler) HandleGetSwapInfo(c *gin.Context) {
-	symbol := c.Query("symbol")
-	blockHash := c.Query("blockHash")
-	txHash := c.Query("txHash")
-	//check param
-	if !utils.SymbolValid(symbol) {
-		utils.Err(c, codeSymbolErr, "symbol unsupport")
-		return
-	}
-	if _, err := hexutil.Decode(blockHash); err != nil {
-		utils.Err(c, codeBlockHashErr, "blockHash format err")
-		return
-	}
-	if _, err := hexutil.Decode(txHash); err != nil {
-		utils.Err(c, codeBlockHashErr, "txHash format err")
-		return
-	}
-
-	swapInfo, err := dao_station.GetFeeStationSwapInfoBySymbolBlkTx(h.db, symbol, strings.ToLower(blockHash), strings.ToLower(txHash))
-	if err != nil && err != gorm.ErrRecordNotFound {
-		utils.Err(c, codeInternalErr, err.Error())
-		return
-	}
-	if err != nil && err == gorm.ErrRecordNotFound {
-		utils.Err(c, codeSwapInfoNotExistErr, err.Error())
-		return
-	}
-
-	rsp := RspSwapInfo{
-		SwapStatus: swapInfo.State,
-	}
-	utils.Ok(c, "success", rsp)
 }

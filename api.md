@@ -22,7 +22,7 @@
 	codeMinLimitErr           = "80015"
 	codeMaxLimitErr           = "80016"
 	codeSwapInfoNotExistErr   = "80017"
-
+	codeBundleIdNotExistErr   = "80018"
 ```
 
 

@@ -20,7 +20,7 @@ import (
 var minReserveValue = big.NewInt(1e12)
 
 func CheckPayInfo(db *db.WrapDb, fisEndpoint, swapLimit string, key *signature.KeyringPair) error {
-	swapInfoList, err := dao_station.GetSwapInfoListByState(db, utils.SwapStateVerifyTxOk)
+	swapInfoList, err := dao_station.GetFeeStationSwapInfoListByState(db, utils.SwapStateVerifyTxOk)
 	if err != nil {
 		return err
 	}
@@ -100,7 +100,7 @@ func CheckPayInfo(db *db.WrapDb, fisEndpoint, swapLimit string, key *signature.K
 			break
 		}
 		swapInfo.State = utils.SwapStatePayOk
-		err := dao_station.UpOrInSwapInfo(tx, swapInfo)
+		err := dao_station.UpOrInFeeStationSwapInfo(tx, swapInfo)
 		if err != nil {
 			tx.RollbackTransaction()
 			return err
@@ -115,7 +115,7 @@ func CheckPayInfo(db *db.WrapDb, fisEndpoint, swapLimit string, key *signature.K
 		if i > transferMaxIndex {
 			break
 		}
-		new, err := dao_station.GetSwapInfoBySymbolBlkTx(db, swapInfo.Symbol, swapInfo.Blockhash, swapInfo.Txhash)
+		new, err := dao_station.GetFeeStationSwapInfoBySymbolBlkTx(db, swapInfo.Symbol, swapInfo.Blockhash, swapInfo.Txhash)
 		if err != nil {
 			return err
 		}

@@ -40,10 +40,10 @@ func UpdatePrice(db *db.WrapDb, coinMarketApi, coinGeckoApi string) error {
 	}
 
 	for key, value := range priceMap {
-		token, _ := dao_station.GetTokenPriceBySymbol(db, key)
+		token, _ := dao_station.GetFeeStationTokenPriceBySymbol(db, key)
 		token.Symbol = key
 		token.Price = decimal.NewFromFloat(value).Mul(decimal.NewFromBigInt(big.NewInt(1), 18)).StringFixed(0)
-		err := dao_station.UpOrInTokenPrice(db, token)
+		err := dao_station.UpOrInFeeStationTokenPrice(db, token)
 		if err != nil {
 			return err
 		}

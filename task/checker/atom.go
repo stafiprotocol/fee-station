@@ -23,7 +23,7 @@ import (
 )
 
 func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
-	swapInfoList, err := dao_station.GetSwapInfoListBySymbolState(db, utils.SymbolAtom, utils.SwapStateVerifySigs)
+	swapInfoList, err := dao_station.GetFeeStationSwapInfoListBySymbolState(db, utils.SymbolAtom, utils.SwapStateVerifySigs)
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 			return err
 		}
 		swapInfo.State = status
-		err = dao_station.UpOrInSwapInfo(db, swapInfo)
+		err = dao_station.UpOrInFeeStationSwapInfo(db, swapInfo)
 		if err != nil {
 			logrus.Errorf("dao_station.UpOrInSwapInfo err: %s", err)
 			return err
@@ -71,7 +71,7 @@ func CheckAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 	return nil
 }
 
-func TransferVerifyAtom(client *cosmosRpc.Client, swapInfo *dao_station.SwapInfo) (uint8, error) {
+func TransferVerifyAtom(client *cosmosRpc.Client, swapInfo *dao_station.FeeStationSwapInfo) (uint8, error) {
 	stafiAddressBytes, err := hexutil.Decode(swapInfo.StafiAddress)
 	if err != nil {
 		return 0, err

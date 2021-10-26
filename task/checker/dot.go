@@ -17,7 +17,7 @@ import (
 )
 
 func CheckDotTx(db *db.WrapDb, dotEndpoint, typesPath string) error {
-	swapInfoList, err := dao_station.GetSwapInfoListBySymbolState(db, utils.SymbolDot, utils.SwapStateVerifySigs)
+	swapInfoList, err := dao_station.GetFeeStationSwapInfoListBySymbolState(db, utils.SymbolDot, utils.SwapStateVerifySigs)
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func CheckDotTx(db *db.WrapDb, dotEndpoint, typesPath string) error {
 			return err
 		}
 		swapInfo.State = status
-		err = dao_station.UpOrInSwapInfo(db, swapInfo)
+		err = dao_station.UpOrInFeeStationSwapInfo(db, swapInfo)
 		if err != nil {
 			logrus.Errorf("dao_station.UpOrInSwapInfo err: %s", err)
 			return err
@@ -73,7 +73,7 @@ func CheckDotTx(db *db.WrapDb, dotEndpoint, typesPath string) error {
 	return nil
 }
 
-func TransferVerifySubstrate(gc *substrate.GsrpcClient, sc *substrate.SarpcClient, swapInfo *dao_station.SwapInfo) (uint8, error) {
+func TransferVerifySubstrate(gc *substrate.GsrpcClient, sc *substrate.SarpcClient, swapInfo *dao_station.FeeStationSwapInfo) (uint8, error) {
 	bh := swapInfo.Blockhash
 	hash, err := types.NewHashFromHexString(swapInfo.Blockhash)
 	if err != nil {
