@@ -23,6 +23,10 @@ type ReqBundleAddress struct {
 	Pubkey       string `json:"pubkey"`    //hex
 }
 
+type RspBundleAddress struct {
+	BundleAddressId int64 `json:"bundleAddressId"`
+}
+
 // @Summary bundle address
 // @Description bundle stafi address
 // @Tags v1
@@ -170,6 +174,9 @@ func (h *Handler) HandlePostBundleAddress(c *gin.Context) {
 		logrus.Errorf("InsertFeeStationBundleAddress err %v", err)
 		return
 	}
+	rsp := RspBundleAddress{
+		BundleAddressId: bundleAddress.ID,
+	}
 
-	utils.Ok(c, "success", bundleAddress.ID)
+	utils.Ok(c, "success", rsp)
 }
