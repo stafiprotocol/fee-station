@@ -32,6 +32,8 @@ type Config struct {
 	SwapMinLimit string //decimals 12
 	Mode         string //release debug test
 	PoolAddress  PoolAddress
+	//syncer
+	SyncTxEndpoint SyncTxEndpoint
 	//common
 	Db Db
 }
@@ -44,6 +46,13 @@ type PoolAddress struct {
 }
 
 type Endpoint struct {
+	Eth  string
+	Atom string
+	Dot  string
+	Ksm  string
+}
+
+type SyncTxEndpoint struct {
 	Eth  string
 	Atom string
 	Dot  string

@@ -5,4 +5,5 @@
 /conf_payer.toml
 /conf_station.toml
 /conf_checker.toml
+/conf_syncer.toml
 /keys/

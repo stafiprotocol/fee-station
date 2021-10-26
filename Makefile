@@ -11,6 +11,7 @@ build:
 	cd cmd/stationd && env GOARCH=amd64 go build -o ../../build/stationd
 	cd cmd/checkerd && env GOARCH=amd64 go build -o ../../build/checkerd
 	cd cmd/payerd && env GOARCH=amd64 go build -o ../../build/payerd
+	cd cmd/syncerd && env GOARCH=amd64 go build -o ../../build/syncerd
 
 ## license: Adds license header to missing files.
 license:

@@ -18,7 +18,7 @@ func UpOrInFeeStationNativeChainTx(db *db.WrapDb, c *FeeStationNativeChainTx) er
 	return db.Save(c).Error
 }
 
-func GetFeeStationNativeChainTxByTxhash(db *db.WrapDb, symbol, tx string) (info *FeeStationNativeChainTx, err error) {
+func GetFeeStationNativeChainTxBySymbolTxhash(db *db.WrapDb, symbol, tx string) (info *FeeStationNativeChainTx, err error) {
 	info = &FeeStationNativeChainTx{}
 	err = db.Take(info, "symbol = ? and tx_hash = ?", symbol, tx).Error
 	return
