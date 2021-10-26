@@ -33,7 +33,7 @@ type RspBundleAddress struct {
 // @Accept json
 // @Produce json
 // @Param param body ReqBundleAddress true "bundle address"
-// @Success 200 {object} utils.Rsp{}
+// @Success 200 {object} utils.Rsp{data=RspBundleAddress}
 // @Router /v1/station/bundleAddress [post]
 func (h *Handler) HandlePostBundleAddress(c *gin.Context) {
 	req := ReqBundleAddress{}

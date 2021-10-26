@@ -11,6 +11,22 @@ definitions:
       symbol:
         type: string
     type: object
+  station_handlers.ReqBundleAddress:
+    properties:
+      poolAddress:
+        type: string
+      pubkey:
+        description: hex
+        type: string
+      signature:
+        description: hex
+        type: string
+      stafiAddress:
+        description: hex
+        type: string
+      symbol:
+        type: string
+    type: object
   station_handlers.ReqSwapInfo:
     properties:
       blockHash:
@@ -38,6 +54,41 @@ definitions:
       txHash:
         description: hex
         type: string
+    type: object
+  station_handlers.ReqSwapInfoV2:
+    properties:
+      blockHash:
+        description: hex
+        type: string
+      bundleAddressId:
+        type: integer
+      inAmount:
+        description: decimal
+        type: string
+      minOutAmount:
+        description: decimal
+        type: string
+      poolAddress:
+        type: string
+      pubkey:
+        description: hex format eth:address other:pubkey
+        type: string
+      signature:
+        description: hex
+        type: string
+      stafiAddress:
+        description: hex
+        type: string
+      symbol:
+        type: string
+      txHash:
+        description: hex
+        type: string
+    type: object
+  station_handlers.RspBundleAddress:
+    properties:
+      bundleAddressId:
+        type: integer
     type: object
   station_handlers.RspPoolInfo:
     properties:
@@ -75,6 +126,33 @@ info:
   title: drop API
   version: "1.0"
 paths:
+  /v1/station/bundleAddress:
+    post:
+      consumes:
+      - application/json
+      description: bundle stafi address
+      parameters:
+      - description: bundle address
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/station_handlers.ReqBundleAddress'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Rsp'
+            - properties:
+                data:
+                  $ref: '#/definitions/station_handlers.RspBundleAddress'
+              type: object
+      summary: bundle address
+      tags:
+      - v1
   /v1/station/poolInfo:
     get:
       description: get pool info
@@ -148,4 +226,26 @@ paths:
       summary: post swap info
       tags:
       - v1
+  /v2/station/swapInfo:
+    post:
+      consumes:
+      - application/json
+      description: post swap info v2
+      parameters:
+      - description: user swap info v2
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/station_handlers.ReqSwapInfoV2'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Rsp'
+      summary: post swap info v2
+      tags:
+      - v2
 swagger: "2.0"
