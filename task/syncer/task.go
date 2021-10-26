@@ -9,6 +9,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Frequency of polling for a new block
+const (
+	BlockRetryInterval = time.Second * 6
+	BlockRetryLimit    = 100
+	BlockConfirmNumber = int64(1)
+)
+
 type Task struct {
 	taskTicker     int64
 	atomDenom      string

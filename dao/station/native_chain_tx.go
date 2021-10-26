@@ -6,6 +6,7 @@ import "fee-station/pkg/db"
 type FeeStationNativeChainTx struct {
 	db.BaseModel
 	State        uint8  `gorm:"type:tinyint(1);unsigned;not null;default:0;column:state"` //0: not deal 1: has deal
+	TxStatus     int64  `gorm:"unsigned;not null;default:0;column:tx_status"`             //tx status 0 success
 	Symbol       string `gorm:"type:varchar(10);not null;default:'symbol';column:symbol"`
 	Blockhash    string `gorm:"type:varchar(80);not null;default:'0x';column:block_hash"`
 	Txhash       string `gorm:"type:varchar(80);not null;default:'0x';column:tx_hash;uniqueIndex:uni_idx_tx"`
@@ -21,6 +22,11 @@ func UpOrInFeeStationNativeChainTx(db *db.WrapDb, c *FeeStationNativeChainTx) er
 func GetFeeStationNativeChainTxBySymbolTxhash(db *db.WrapDb, symbol, tx string) (info *FeeStationNativeChainTx, err error) {
 	info = &FeeStationNativeChainTx{}
 	err = db.Take(info, "symbol = ? and tx_hash = ?", symbol, tx).Error
+	return
+}
+
+func GetFeeStationNativeChainTxTotalCount(db *db.WrapDb, symbol string) (count int64, err error) {
+	err = db.Model(&FeeStationNativeChainTx{}).Where("symbol = ?", symbol).Count(&count).Error
 	return
 }
 

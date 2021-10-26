@@ -97,7 +97,7 @@ func TestGetPubKey(t *testing.T) {
 func TestGetEvents(t *testing.T) {
 	events, err := client.GetEvents(
 		[]string{"transfer.recipient='cosmos1jacw22mwkaswlml3ra7w7ue4fdak33kyx9fc8x'"},
-		1, 10, "")
+		1, 10, "asc")
 	if err != nil {
 		t.Fatal(err)
 	}
