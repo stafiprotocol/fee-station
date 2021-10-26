@@ -56,7 +56,7 @@ func SyncAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 		}
 		break
 	}
-	filter := []string{fmt.Sprintf("transfer.recipient='%s'", poolAddress)}
+	filter := []string{fmt.Sprintf("transfer.recipient='%s'", poolAddress), "message.module='bank'"}
 
 	for {
 		totalCount, err := dao_station.GetFeeStationNativeChainTxTotalCount(db, utils.SymbolAtom)
@@ -65,7 +65,7 @@ func SyncAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 		}
 
 		usePage := totalCount/int64(pageLimit) + 1
-		txRes, err := client.GetEvents(filter, int(usePage), pageLimit, "")
+		txRes, err := client.GetEvents(filter, int(usePage), pageLimit, "asc")
 		if err != nil {
 			return err
 		}
