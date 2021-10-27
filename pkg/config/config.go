@@ -34,6 +34,7 @@ type Config struct {
 	PoolAddress  PoolAddress
 	//syncer
 	EtherScanApiKey string
+	SubScanApiKey   string
 	SyncTxEndpoint  SyncTxEndpoint
 	//common
 	Db Db

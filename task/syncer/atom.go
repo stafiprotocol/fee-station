@@ -21,6 +21,7 @@ import (
 
 var (
 	pageLimit = 10
+	dayLayout = "2006-01-02T15:04:05Z"
 )
 
 func SyncAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
@@ -118,6 +119,10 @@ func SyncAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 			if err != nil {
 				return err
 			}
+			txTimestamp, err := time.Parse(dayLayout, tx.Timestamp)
+			if err != nil {
+				return err
+			}
 
 			nativeTx := dao_station.FeeStationNativeChainTx{
 				State:        0,
@@ -128,6 +133,7 @@ func SyncAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 				PoolAddress:  poolAddress,
 				SenderPubkey: strings.ToLower(hexutil.Encode(accountRes.GetPubKey().Bytes())),
 				InAmount:     inAmount,
+				TxTimestamp:  txTimestamp.Unix(),
 			}
 
 			err = dao_station.UpOrInFeeStationNativeChainTx(db, &nativeTx)

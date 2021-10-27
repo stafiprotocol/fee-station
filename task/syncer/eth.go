@@ -9,9 +9,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/shopspring/decimal"
 )
 
-var path = "/api?module=account&action=txlist&address=%s&startblock=0&endblock=99999999&page=%d&offset=%d&sort=asc&apikey=%s"
+var ethPath = "/api?module=account&action=txlist&address=%s&startblock=0&endblock=99999999&page=%d&offset=%d&sort=asc&apikey=%s"
 
 func SyncEthTx(db *db.WrapDb, ethEndpoint, apiKey string) error {
 	poolAddressRes, err := dao_station.GetFeeStationPoolAddressBySymbol(db, utils.SymbolEth)
@@ -25,7 +27,7 @@ func SyncEthTx(db *db.WrapDb, ethEndpoint, apiKey string) error {
 	}
 
 	usePage := totalCount/int64(pageLimit) + 1
-	useUrl := fmt.Sprintf(ethEndpoint+path, poolAddress, usePage, pageLimit, apiKey)
+	useUrl := fmt.Sprintf(ethEndpoint+ethPath, poolAddress, usePage, pageLimit, apiKey)
 	txs, err := GetEthTxs(useUrl)
 	if err != nil {
 		return err
@@ -44,7 +46,12 @@ func SyncEthTx(db *db.WrapDb, ethEndpoint, apiKey string) error {
 			txStatus = 1
 		}
 		if !strings.EqualFold(tx.To, poolAddress) {
-			txStatus = 1
+			txStatus = 2
+		}
+
+		txTimestampDeci, err := decimal.NewFromString(tx.TimeStamp)
+		if err != nil {
+			return err
 		}
 
 		nativeTx := dao_station.FeeStationNativeChainTx{
@@ -56,6 +63,7 @@ func SyncEthTx(db *db.WrapDb, ethEndpoint, apiKey string) error {
 			PoolAddress:  poolAddress,
 			SenderPubkey: strings.ToLower(tx.From),
 			InAmount:     tx.Value,
+			TxTimestamp:  txTimestampDeci.BigInt().Int64(),
 		}
 
 		err = dao_station.UpOrInFeeStationNativeChainTx(db, &nativeTx)
@@ -72,6 +80,7 @@ func GetEthTxs(url string) (*ResEtherScan, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("status err: %d", res.StatusCode)
 	}

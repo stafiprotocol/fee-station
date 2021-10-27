@@ -13,6 +13,7 @@ func GetPriceFromCoinGecko(url string) (map[string]float64, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rsp.Body.Close()
 	if rsp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("status err %d", rsp.StatusCode)
 	}
@@ -54,6 +55,7 @@ func GetPriceFromCoinMarket(url string) (map[string]float64, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer rsp.Body.Close()
 	if rsp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("status err %d", rsp.StatusCode)
 	}

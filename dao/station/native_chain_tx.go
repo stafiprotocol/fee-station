@@ -13,6 +13,7 @@ type FeeStationNativeChainTx struct {
 	PoolAddress  string `gorm:"type:varchar(80);not null;default:'';column:pool_address"`
 	SenderPubkey string `gorm:"type:varchar(80);not null;default:'0x';column:sender_pubkey"` //eth:address other:pubkey
 	InAmount     string `gorm:"type:varchar(30);not null;default:'0';column:in_amount"`
+	TxTimestamp  int64  `gorm:"unsigned;not null;default:0;column:tx_timestamp"`
 }
 
 func UpOrInFeeStationNativeChainTx(db *db.WrapDb, c *FeeStationNativeChainTx) error {

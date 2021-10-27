@@ -21,6 +21,7 @@ type Task struct {
 	atomDenom       string
 	stop            chan struct{}
 	etherScanApiKey string
+	subScanApiKey   string
 	syncTxEndPoint  config.SyncTxEndpoint
 	db              *db.WrapDb
 }
@@ -31,6 +32,7 @@ func NewTask(cfg *config.Config, dao *db.WrapDb) *Task {
 		atomDenom:       cfg.AtomDenom,
 		stop:            make(chan struct{}),
 		etherScanApiKey: cfg.EtherScanApiKey,
+		subScanApiKey:   cfg.SubScanApiKey,
 		syncTxEndPoint:  cfg.SyncTxEndpoint,
 		db:              dao,
 	}
@@ -81,7 +83,7 @@ out:
 			break out
 		case <-ticker.C:
 			logrus.Infof("task SyncDotTx start -----------")
-			err := SyncDotTx(task.db, task.syncTxEndPoint.Dot)
+			err := SyncDotTx(task.db, task.syncTxEndPoint.Dot, task.subScanApiKey)
 			if err != nil {
 				logrus.Errorf("task.SyncDotTx err %s", err)
 				utils.ShutdownRequestChannel <- struct{}{}
@@ -102,7 +104,7 @@ out:
 			break out
 		case <-ticker.C:
 			logrus.Infof("task SyncKsmTx start -----------")
-			err := SyncKsmTx(task.db, task.syncTxEndPoint.Ksm)
+			err := SyncKsmTx(task.db, task.syncTxEndPoint.Ksm, task.subScanApiKey)
 			if err != nil {
 				logrus.Errorf("task.SyncKsmTx err %s", err)
 				utils.ShutdownRequestChannel <- struct{}{}
