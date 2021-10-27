@@ -18,7 +18,8 @@ const (
 
 type Task struct {
 	taskTicker      int64
-	recoverTime     int64
+	recoverInterval int64
+	startTimestamp  int64
 	swapMaxLimit    string
 	atomDenom       string
 	stop            chan struct{}
@@ -31,7 +32,8 @@ type Task struct {
 func NewTask(cfg *config.Config, dao *db.WrapDb) *Task {
 	s := &Task{
 		taskTicker:      cfg.TaskTicker,
-		recoverTime:     cfg.RecoverTime,
+		recoverInterval: cfg.RecoverInterval,
+		startTimestamp:  cfg.StartTimestamp,
 		swapMaxLimit:    cfg.SwapMaxLimit,
 		atomDenom:       cfg.AtomDenom,
 		stop:            make(chan struct{}),
@@ -151,7 +153,7 @@ out:
 			break out
 		case <-ticker.C:
 			logrus.Infof("task Recover start -----------")
-			err := Recover(task.db, task.recoverTime, task.swapMaxLimit)
+			err := Recover(task.db, task.recoverInterval, task.startTimestamp, task.swapMaxLimit)
 			if err != nil {
 				logrus.Errorf("task.Recover err %s", err)
 				utils.ShutdownRequestChannel <- struct{}{}

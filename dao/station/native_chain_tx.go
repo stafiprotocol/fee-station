@@ -36,7 +36,7 @@ func GetFeeStationNativeTxBySymbolState(db *db.WrapDb, symbol string, state uint
 	return
 }
 
-func GetFeeStationNativeTxByState(db *db.WrapDb, state uint8, txStatus int64) (infos []*FeeStationNativeChainTx, err error) {
-	err = db.Find(&infos, "state = ? and tx_status = ?", state, txStatus).Error
+func GetFeeStationNativeTxByState(db *db.WrapDb, state uint8, txStatus, startTimestamp int64) (infos []*FeeStationNativeChainTx, err error) {
+	err = db.Find(&infos, "state = ? and tx_status = ? and tx_timestamp > ?", state, txStatus, startTimestamp).Error
 	return
 }

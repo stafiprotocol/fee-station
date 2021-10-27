@@ -35,7 +35,8 @@ type Config struct {
 	//syncer
 	EtherScanApiKey string
 	SubScanApiKey   string
-	RecoverTime     int64
+	RecoverInterval int64
+	StartTimestamp  int64
 	SyncTxEndpoint  SyncTxEndpoint
 	//common
 	Db Db

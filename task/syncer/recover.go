@@ -13,8 +13,8 @@ import (
 
 //1 tag native_chain_tx stake=1 which exist in swap_info
 //2 find native_chain_tx need recover and insert to swap_info
-func Recover(db *db.WrapDb, recoverTime int64, swapMaxLimit string) error {
-	nativeNotDealTxs, err := dao_station.GetFeeStationNativeTxByState(db, 0, 0)
+func Recover(db *db.WrapDb, recoverTime, startTimestamp int64, swapMaxLimit string) error {
+	nativeNotDealTxs, err := dao_station.GetFeeStationNativeTxByState(db, 0, 0, startTimestamp)
 	if err != nil {
 		return err
 	}

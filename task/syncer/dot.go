@@ -43,6 +43,7 @@ func SyncDotTx(db *db.WrapDb, dotEndpoint, apiKey string) error {
 	pageMax := txs.Data.Count/pageLimit + 1
 
 	for i := 1; i <= pageMax; i++ {
+		time.Sleep(6 * time.Second)
 		txs, err := GetSubstrateTxs(useUrl, poolAddress, apiKey, i, pageLimit)
 		if err != nil {
 			return err
@@ -73,7 +74,7 @@ func SyncDotTx(db *db.WrapDb, dotEndpoint, apiKey string) error {
 			if err != nil {
 				return err
 			}
-			time.Sleep(3 * time.Second)
+			time.Sleep(6 * time.Second)
 			resBlock, err := GetSubstrateBlock(dotEndpoint+substrateBlockPath, apiKey, tx.BlockNum)
 			if err != nil {
 				return fmt.Errorf("GetSubstrateBlock failed: %s", err)
@@ -132,10 +133,23 @@ func GetSubstrateTxs(url, address, apiKey string, page, pageLimit int) (*ResSubs
 		req.Header.Add("X-API-Key", apiKey)
 	}
 	req.Header.Add("Content-Type", "application/json")
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
+
+	var res *http.Response
+	retry := 0
+	for {
+		if retry > BlockRetryLimit {
+			return nil, fmt.Errorf("GetSubstrateTxs reach retry limit: %s", err)
+		}
+		res, err = client.Do(req)
+		if err != nil {
+			logrus.Warnf("GetSubstrateTxs err: %s", err)
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		break
 	}
+
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("status err: %d", res.StatusCode)
@@ -175,10 +189,23 @@ func GetSubstrateBlock(url, apiKey string, number int) (*ResSubstrateBlock, erro
 		req.Header.Add("X-API-Key", apiKey)
 	}
 	req.Header.Add("Content-Type", "application/json")
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
+
+	var res *http.Response
+	retry := 0
+	for {
+		if retry > BlockRetryLimit {
+			return nil, fmt.Errorf("GetSubstrateBlock reach retry limit: %s", err)
+		}
+		res, err = client.Do(req)
+		if err != nil {
+			logrus.Warnf("GetSubstrateBlock err: %s", err)
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		break
 	}
+
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("status err: %d", res.StatusCode)

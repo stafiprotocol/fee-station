@@ -9,8 +9,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/shopspring/decimal"
+	"github.com/sirupsen/logrus"
 )
 
 var ethPath = "/api?module=account&action=txlist&address=%s&startblock=0&endblock=99999999&page=%d&offset=%d&sort=asc&apikey=%s"
@@ -76,10 +78,24 @@ func SyncEthTx(db *db.WrapDb, ethEndpoint, apiKey string) error {
 }
 
 func GetEthTxs(url string) (*ResEtherScan, error) {
-	res, err := http.Get(url)
-	if err != nil {
-		return nil, err
+
+	var res *http.Response
+	var err error
+	retry := 0
+	for {
+		if retry > BlockRetryLimit {
+			return nil, fmt.Errorf("GetEthTxs reach retry limit: %s", err)
+		}
+		res, err = http.Get(url)
+		if err != nil {
+			logrus.Warnf("GetEthTxs err: %s", err)
+			time.Sleep(BlockRetryInterval)
+			retry++
+			continue
+		}
+		break
 	}
+
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("status err: %d", res.StatusCode)

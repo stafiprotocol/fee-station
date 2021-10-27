@@ -14,7 +14,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func SyncKsmTx(db *db.WrapDb, ksmEndpoint,apiKey string) error {
+func SyncKsmTx(db *db.WrapDb, ksmEndpoint, apiKey string) error {
 	poolAddressRes, err := dao_station.GetFeeStationPoolAddressBySymbol(db, utils.SymbolKsm)
 	if err != nil {
 		return err
@@ -36,6 +36,7 @@ func SyncKsmTx(db *db.WrapDb, ksmEndpoint,apiKey string) error {
 	pageMax := txs.Data.Count/pageLimit + 1
 
 	for i := 1; i <= pageMax; i++ {
+		time.Sleep(6 * time.Second)
 		txs, err := GetSubstrateTxs(useUrl, poolAddress, apiKey, i, pageLimit)
 		if err != nil {
 			return err
@@ -66,7 +67,7 @@ func SyncKsmTx(db *db.WrapDb, ksmEndpoint,apiKey string) error {
 			if err != nil {
 				return err
 			}
-			time.Sleep(3 * time.Second)
+			time.Sleep(6 * time.Second)
 			resBlock, err := GetSubstrateBlock(ksmEndpoint+substrateBlockPath, apiKey, tx.BlockNum)
 			if err != nil {
 				return fmt.Errorf("GetSubstrateBlock failed: %s", err)
