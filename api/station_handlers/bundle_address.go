@@ -153,7 +153,7 @@ func (h *Handler) HandlePostBundleAddress(c *gin.Context) {
 	swapRateDeci, err := decimal.NewFromString(swapRateStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,swapRateStr: %s err %s", swapRateStr, err)
-		swapRateDeci = defaultSwapRateDeci
+		swapRateDeci = utils.DefaultSwapRateDeci
 	}
 
 	//cal real swap rate

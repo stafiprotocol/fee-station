@@ -33,6 +33,12 @@ func GetFeeStationSwapInfoBySymbolBlkTx(db *db.WrapDb, symbol, blk, tx string) (
 	return
 }
 
+func GetFeeStationSwapInfoByTx(db *db.WrapDb, tx string) (info *FeeStationSwapInfo, err error) {
+	info = &FeeStationSwapInfo{}
+	err = db.Take(info, "tx_hash = ?", tx).Error
+	return
+}
+
 func GetFeeStationSwapInfoListBySymbolState(db *db.WrapDb, symbol string, state uint8) (infos []*FeeStationSwapInfo, err error) {
 	err = db.Find(&infos, "symbol = ? and state = ?", symbol, state).Error
 	return

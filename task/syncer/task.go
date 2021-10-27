@@ -18,6 +18,8 @@ const (
 
 type Task struct {
 	taskTicker      int64
+	recoverTime     int64
+	swapMaxLimit    string
 	atomDenom       string
 	stop            chan struct{}
 	etherScanApiKey string
@@ -29,6 +31,8 @@ type Task struct {
 func NewTask(cfg *config.Config, dao *db.WrapDb) *Task {
 	s := &Task{
 		taskTicker:      cfg.TaskTicker,
+		recoverTime:     cfg.RecoverTime,
+		swapMaxLimit:    cfg.SwapMaxLimit,
 		atomDenom:       cfg.AtomDenom,
 		stop:            make(chan struct{}),
 		etherScanApiKey: cfg.EtherScanApiKey,
@@ -44,6 +48,7 @@ func (task *Task) Start() error {
 	utils.SafeGoWithRestart(task.DotHandler)
 	utils.SafeGoWithRestart(task.KsmHandler)
 	utils.SafeGoWithRestart(task.EthHandler)
+	utils.SafeGoWithRestart(task.RecoverHandler)
 	return nil
 }
 
@@ -113,6 +118,7 @@ out:
 		}
 	}
 }
+
 func (task *Task) EthHandler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()
@@ -130,6 +136,27 @@ out:
 				utils.ShutdownRequestChannel <- struct{}{}
 			}
 			logrus.Infof("task SyncEthTx end -----------")
+		}
+	}
+}
+
+func (task *Task) RecoverHandler() {
+	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
+	defer ticker.Stop()
+out:
+	for {
+		select {
+		case <-task.stop:
+			logrus.Info("task has stopped")
+			break out
+		case <-ticker.C:
+			logrus.Infof("task Recover start -----------")
+			err := Recover(task.db, task.recoverTime, task.swapMaxLimit)
+			if err != nil {
+				logrus.Errorf("task.Recover err %s", err)
+				utils.ShutdownRequestChannel <- struct{}{}
+			}
+			logrus.Infof("task Recover end -----------")
 		}
 	}
 }

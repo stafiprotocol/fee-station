@@ -17,7 +17,7 @@ func InsertFeeStationBundleAddress(db *db.WrapDb, c *FeeStationBundleAddress) er
 }
 
 func GetFeeStationBundleAddressListByPubkeySymbol(db *db.WrapDb, pubkey, symbol string) (c []*FeeStationBundleAddress, err error) {
-	err = db.Find(&c, "pubkey = ? and symbol = ?", pubkey, symbol).Error
+	err = db.Order("create_time desc").Find(&c, "pubkey = ? and symbol = ?", pubkey, symbol).Error
 	return
 }
 

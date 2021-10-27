@@ -19,16 +19,6 @@ import (
 
 var priceExpiredSeconds = 60 * 60 * 24 * 3 // 3 days
 
-var defaultSwapMaxLimitDeci = decimal.NewFromBigInt(big.NewInt(100), 12) //default 100e12
-var defaultSwapMinLimitDeci = decimal.NewFromBigInt(big.NewInt(1), 12)   //default 1e12
-var defaultSwapRateDeci = decimal.NewFromBigInt(big.NewInt(1), 6)        //default 1e6
-var decimalsMap = map[string]int32{
-	utils.SymbolAtom: 6,
-	utils.SymbolDot:  10,
-	utils.SymbolKsm:  12,
-	utils.SymbolEth:  18,
-}
-
 type ReqSwapInfo struct {
 	StafiAddress string `json:"stafiAddress"` //hex
 	Symbol       string `json:"symbol"`
@@ -180,17 +170,17 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 	swapRateDeci, err := decimal.NewFromString(swapRateStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,swapRateStr: %s err %s", swapRateStr, err)
-		swapRateDeci = defaultSwapRateDeci
+		swapRateDeci = utils.DefaultSwapRateDeci
 	}
 	swapMaxLimitDeci, err := decimal.NewFromString(swapMaxLimitStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,swapMaxLimitStr: %s err %s", swapMaxLimitStr, err)
-		swapMaxLimitDeci = defaultSwapMaxLimitDeci
+		swapMaxLimitDeci = utils.DefaultSwapMaxLimitDeci
 	}
 	swapMinLimitDeci, err := decimal.NewFromString(swapMinLimitStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,swapMinLimitStr: %s err %s", swapMinLimitStr, err)
-		swapMinLimitDeci = defaultSwapMinLimitDeci
+		swapMinLimitDeci = utils.DefaultSwapMinLimitDeci
 	}
 
 	//cal real swap rate
@@ -202,7 +192,7 @@ func (h *Handler) HandlePostSwapInfo(c *gin.Context) {
 		return
 	}
 	//out amount
-	symbolDecimals := decimalsMap[req.Symbol]
+	symbolDecimals := utils.DecimalsMap[req.Symbol]
 	outAmount := realSwapRateDeci.Mul(inAmountDeci).Div(decimal.NewFromBigInt(big.NewInt(1), symbolDecimals-6))
 	if outAmount.Cmp(swapMaxLimitDeci) > 0 {
 		outAmount = swapMaxLimitDeci

@@ -180,17 +180,17 @@ func (h *Handler) HandlePostSwapInfoV2(c *gin.Context) {
 	swapRateDeci, err := decimal.NewFromString(swapRateStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,swapRateStr: %s err %s", swapRateStr, err)
-		swapRateDeci = defaultSwapRateDeci
+		swapRateDeci = utils.DefaultSwapRateDeci
 	}
 	swapMaxLimitDeci, err := decimal.NewFromString(swapMaxLimitStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,swapMaxLimitStr: %s err %s", swapMaxLimitStr, err)
-		swapMaxLimitDeci = defaultSwapMaxLimitDeci
+		swapMaxLimitDeci = utils.DefaultSwapMaxLimitDeci
 	}
 	swapMinLimitDeci, err := decimal.NewFromString(swapMinLimitStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,swapMinLimitStr: %s err %s", swapMinLimitStr, err)
-		swapMinLimitDeci = defaultSwapMinLimitDeci
+		swapMinLimitDeci = utils.DefaultSwapMinLimitDeci
 	}
 
 	//cal real swap rate
@@ -202,7 +202,7 @@ func (h *Handler) HandlePostSwapInfoV2(c *gin.Context) {
 		return
 	}
 	//out amount
-	symbolDecimals := decimalsMap[req.Symbol]
+	symbolDecimals := utils.DecimalsMap[req.Symbol]
 	outAmount := realSwapRateDeci.Mul(inAmountDeci).Div(decimal.NewFromBigInt(big.NewInt(1), symbolDecimals-6))
 	if outAmount.Cmp(swapMaxLimitDeci) > 0 {
 		outAmount = swapMaxLimitDeci

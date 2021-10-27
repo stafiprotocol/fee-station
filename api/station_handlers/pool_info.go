@@ -39,17 +39,17 @@ func (h *Handler) HandleGetPoolInfo(c *gin.Context) {
 	swapRateDeci, err := decimal.NewFromString(swapRateStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,str:%s err %s", swapRateStr, err)
-		swapRateDeci = defaultSwapRateDeci
+		swapRateDeci = utils.DefaultSwapRateDeci
 	}
 	swapMaxLimitDeci, err := decimal.NewFromString(swapMaxLimitStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,swapMaxLimitStr:%s err %s", swapMaxLimitStr, err)
-		swapMaxLimitDeci = defaultSwapMaxLimitDeci
+		swapMaxLimitDeci = utils.DefaultSwapMaxLimitDeci
 	}
 	swapMinLimitDeci, err := decimal.NewFromString(swapMinLimitStr)
 	if err != nil {
 		logrus.Errorf("decimal.NewFromString,swapMinLimitStr:%s err %s", swapMinLimitStr, err)
-		swapMinLimitDeci = defaultSwapMinLimitDeci
+		swapMinLimitDeci = utils.DefaultSwapMinLimitDeci
 	}
 
 	rsp := RspPoolInfo{
