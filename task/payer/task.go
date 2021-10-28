@@ -54,8 +54,12 @@ func (task *Task) Stop() {
 func (task *Task) Handler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()
+	retry := 0
 out:
 	for {
+		if retry > BlockRetryLimit {
+			utils.ShutdownRequestChannel <- struct{}{}
+		}
 		select {
 		case <-task.stop:
 			logrus.Info("task has stopped")
@@ -65,9 +69,12 @@ out:
 			err := CheckPayInfo(task.db, task.fisEndpoint, task.swapMaxLimit, task.key)
 			if err != nil {
 				logrus.Errorf("task.CheckPayInfo err %s", err)
-				utils.ShutdownRequestChannel <- struct{}{}
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue out
 			}
 			logrus.Infof("task CheckPayInfo end -----------")
+			retry = 0
 		}
 	}
 }

@@ -59,8 +59,12 @@ func (task *Task) Stop() {
 func (task *Task) AtomHandler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()
+	retry := 0
 out:
 	for {
+		if retry > BlockRetryLimit {
+			utils.ShutdownRequestChannel <- struct{}{}
+		}
 		select {
 		case <-task.stop:
 			logrus.Info("task has stopped")
@@ -70,9 +74,12 @@ out:
 			err := CheckAtomTx(task.db, task.atomDenom, task.endPoint.Atom)
 			if err != nil {
 				logrus.Errorf("task.CheckAtomTx err %s", err)
-				utils.ShutdownRequestChannel <- struct{}{}
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue out
 			}
 			logrus.Infof("task CheckAtomTx end -----------")
+			retry = 0
 		}
 	}
 }
@@ -80,8 +87,12 @@ out:
 func (task *Task) DotHandler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()
+	retry := 0
 out:
 	for {
+		if retry > BlockRetryLimit {
+			utils.ShutdownRequestChannel <- struct{}{}
+		}
 		select {
 		case <-task.stop:
 			logrus.Info("task has stopped")
@@ -91,9 +102,12 @@ out:
 			err := CheckDotTx(task.db, task.endPoint.Dot, task.dotTypesPath)
 			if err != nil {
 				logrus.Errorf("task.CheckDotTx err %s", err)
-				utils.ShutdownRequestChannel <- struct{}{}
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue out
 			}
 			logrus.Infof("task CheckDotTx end -----------")
+			retry = 0
 		}
 	}
 }
@@ -101,8 +115,12 @@ out:
 func (task *Task) KsmHandler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()
+	retry := 0
 out:
 	for {
+		if retry > BlockRetryLimit {
+			utils.ShutdownRequestChannel <- struct{}{}
+		}
 		select {
 		case <-task.stop:
 			logrus.Info("task has stopped")
@@ -112,17 +130,24 @@ out:
 			err := CheckKsmTx(task.db, task.endPoint.Ksm, task.ksmTypesPath)
 			if err != nil {
 				logrus.Errorf("task.CheckKsmTx err %s", err)
-				utils.ShutdownRequestChannel <- struct{}{}
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue out
 			}
 			logrus.Infof("task CheckKsmTx end -----------")
+			retry = 0
 		}
 	}
 }
 func (task *Task) EthHandler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()
+	retry := 0
 out:
 	for {
+		if retry > BlockRetryLimit {
+			utils.ShutdownRequestChannel <- struct{}{}
+		}
 		select {
 		case <-task.stop:
 			logrus.Info("task has stopped")
@@ -132,9 +157,12 @@ out:
 			err := CheckEthTx(task.db, task.endPoint.Eth)
 			if err != nil {
 				logrus.Errorf("task.CheckEthTx err %s", err)
-				utils.ShutdownRequestChannel <- struct{}{}
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue out
 			}
 			logrus.Infof("task CheckEthTx end -----------")
+			retry = 0
 		}
 	}
 }
@@ -142,8 +170,12 @@ out:
 func (task *Task) PriceUpdateHandler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()
+	retry := 0
 out:
 	for {
+		if retry > BlockRetryLimit {
+			utils.ShutdownRequestChannel <- struct{}{}
+		}
 		select {
 		case <-task.stop:
 			logrus.Info("task has stopped")
@@ -154,9 +186,12 @@ out:
 			err := UpdatePrice(task.db, task.coinMarketApi, task.coinGeckoApi)
 			if err != nil {
 				logrus.Errorf("task.UpdatePrice err %s", err)
-				utils.ShutdownRequestChannel <- struct{}{}
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue out
 			}
 			logrus.Infof("task UpdatePrice end -----------")
+			retry = 0
 		}
 	}
 }

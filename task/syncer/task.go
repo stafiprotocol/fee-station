@@ -61,8 +61,14 @@ func (task *Task) Stop() {
 func (task *Task) AtomHandler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()
+	retry := 0
 out:
 	for {
+
+		if retry > BlockRetryLimit {
+			utils.ShutdownRequestChannel <- struct{}{}
+		}
+
 		select {
 		case <-task.stop:
 			logrus.Info("task has stopped")
@@ -72,9 +78,12 @@ out:
 			err := SyncAtomTx(task.db, task.atomDenom, task.syncTxEndPoint.Atom)
 			if err != nil {
 				logrus.Errorf("task.SyncAtomTx err %s", err)
-				utils.ShutdownRequestChannel <- struct{}{}
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue out
 			}
 			logrus.Infof("task syncAtomTx end -----------")
+			retry = 0
 		}
 	}
 }
@@ -82,8 +91,12 @@ out:
 func (task *Task) DotHandler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()
+	retry := 0
 out:
 	for {
+		if retry > BlockRetryLimit {
+			utils.ShutdownRequestChannel <- struct{}{}
+		}
 		select {
 		case <-task.stop:
 			logrus.Info("task has stopped")
@@ -93,9 +106,12 @@ out:
 			err := SyncDotTx(task.db, task.syncTxEndPoint.Dot, task.subScanApiKey)
 			if err != nil {
 				logrus.Errorf("task.SyncDotTx err %s", err)
-				utils.ShutdownRequestChannel <- struct{}{}
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue out
 			}
 			logrus.Infof("task SyncDotTx end -----------")
+			retry = 0
 		}
 	}
 }
@@ -103,8 +119,12 @@ out:
 func (task *Task) KsmHandler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()
+	retry := 0
 out:
 	for {
+		if retry > BlockRetryLimit {
+			utils.ShutdownRequestChannel <- struct{}{}
+		}
 		select {
 		case <-task.stop:
 			logrus.Info("task has stopped")
@@ -114,9 +134,12 @@ out:
 			err := SyncKsmTx(task.db, task.syncTxEndPoint.Ksm, task.subScanApiKey)
 			if err != nil {
 				logrus.Errorf("task.SyncKsmTx err %s", err)
-				utils.ShutdownRequestChannel <- struct{}{}
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue out
 			}
 			logrus.Infof("task SyncKsmTx end -----------")
+			retry = 0
 		}
 	}
 }
@@ -124,8 +147,12 @@ out:
 func (task *Task) EthHandler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()
+	retry := 0
 out:
 	for {
+		if retry > BlockRetryLimit {
+			utils.ShutdownRequestChannel <- struct{}{}
+		}
 		select {
 		case <-task.stop:
 			logrus.Info("task has stopped")
@@ -135,9 +162,12 @@ out:
 			err := SyncEthTx(task.db, task.syncTxEndPoint.Eth, task.etherScanApiKey)
 			if err != nil {
 				logrus.Errorf("task.SyncEthTx err %s", err)
-				utils.ShutdownRequestChannel <- struct{}{}
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue out
 			}
 			logrus.Infof("task SyncEthTx end -----------")
+			retry = 0
 		}
 	}
 }
@@ -145,8 +175,12 @@ out:
 func (task *Task) RecoverHandler() {
 	ticker := time.NewTicker(time.Duration(task.taskTicker) * time.Second)
 	defer ticker.Stop()
+	retry := 0
 out:
 	for {
+		if retry > BlockRetryLimit {
+			utils.ShutdownRequestChannel <- struct{}{}
+		}
 		select {
 		case <-task.stop:
 			logrus.Info("task has stopped")
@@ -156,9 +190,12 @@ out:
 			err := Recover(task.db, task.recoverInterval, task.startTimestamp, task.swapMaxLimit)
 			if err != nil {
 				logrus.Errorf("task.Recover err %s", err)
-				utils.ShutdownRequestChannel <- struct{}{}
+				time.Sleep(BlockRetryInterval)
+				retry++
+				continue out
 			}
 			logrus.Infof("task Recover end -----------")
+			retry = 0
 		}
 	}
 }
