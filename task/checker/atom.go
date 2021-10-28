@@ -128,6 +128,7 @@ func TransferVerifyAtom(client *cosmosRpc.Client, swapInfo *dao_station.FeeStati
 	var fromAddressStr string
 
 	msgs := txRes.GetTx().GetMsgs()
+
 	for i, _ := range msgs {
 		if msgs[i].Type() == xBankTypes.TypeMsgSend {
 			if sendMsg, ok := msgs[i].(*xBankTypes.MsgSend); ok {
@@ -140,13 +141,32 @@ func TransferVerifyAtom(client *cosmosRpc.Client, swapInfo *dao_station.FeeStati
 						poolIsMatch = true
 						amountIsMatch = true
 						fromAddressStr = sendMsg.FromAddress
+						break
 					}
 				}
 
 			}
 
+		} else if msgs[i].Type() == xBankTypes.TypeMsgMultiSend {
+			if multiSendMsg, ok := msgs[i].(*xBankTypes.MsgMultiSend); ok {
+				for _, output := range multiSendMsg.Outputs {
+					toAddr, err := types.AccAddressFromBech32(output.Address)
+					if err == nil {
+						//amount and pool address must in one message
+						if bytes.Equal(toAddr.Bytes(), poolAddr.Bytes()) &&
+							output.Coins.AmountOf(client.GetDenom()).Equal(types.NewIntFromBigInt(inAmountDeci.BigInt())) {
+							poolIsMatch = true
+							amountIsMatch = true
+							fromAddressStr = multiSendMsg.Inputs[0].Address
+							break
+						}
+					}
+				}
+
+			}
 		}
 	}
+
 	if !amountIsMatch {
 		return utils.SwapStateAmountFailed, nil
 	}

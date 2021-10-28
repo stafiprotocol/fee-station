@@ -6,7 +6,7 @@ type FeeStationBundleAddress struct {
 	db.BaseModel
 	Symbol       string `gorm:"type:varchar(10);not null;default:'symbol';column:symbol"`
 	StafiAddress string `gorm:"type:varchar(80);not null;default:'0x';column:stafi_address"` //hex
-	Pubkey       string `gorm:"type:varchar(80);not null;default:'0x';column:pubkey"`        //hex maybe polkadot/kusama pubkey
+	Pubkey       string `gorm:"type:varchar(560);not null;default:'0x';column:pubkey"`       //hex maybe polkadot/kusama pubkey
 	SwapRate     string `gorm:"type:varchar(30);not null;default:'0';column:swap_rate"`      // decimal 18
 	PoolAddress  string `gorm:"type:varchar(80);not null;default:'';column:pool_address"`
 	Signature    string `gorm:"type:varchar(150);not null;default:'0x';column:signature"`

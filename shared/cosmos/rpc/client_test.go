@@ -55,26 +55,27 @@ func init() {
 	// client, err = rpc.NewClient(key, "stargate-final", "recipient", "0.04umuon", "umuon", "https://testcosmosrpc.wetez.io:443")
 	var err error
 	// client, err = rpc.NewClient("umuon", "http://127.0.0.1:26657")
-	client, err = rpc.NewClient("stake", "https://cosmos-rpc1.stafi.io:443")
+	// client, err = rpc.NewClient("stake", "https://cosmos-rpc1.stafi.io:443")
+	client, err = rpc.NewClient("stake", "https://testcosmosrpc.wetez.io:443")
 	if err != nil {
 		panic(err)
 	}
 }
 
 func TestClient_QueryTxByHash(t *testing.T) {
-	res, err := client.QueryTxByHash("6C017062FD3F48F13B640E5FEDD59EB050B148E67EF12EC0A511442D32BD4C88")
-	t.Log(err)
+	res, err := client.QueryTxByHash("7aa7a45cd72e237d9548c72987d1eafbf4fcfbc37db4ceeeeec0a4aecf814871")
+	// res, err := client.QueryTxByHash("6f189d3a063c2359cdf1819ccedd17496fb55f6e29cd55d179293459c7681eff")
 	assert.NoError(t, err)
+	t.Log(res.String())
 	for _, msg := range res.GetTx().GetMsgs() {
-
-		t.Log(msg.String())
 		t.Log(msg.Type())
 		t.Log(msg.Route())
+		t.Log(msg.String())
 	}
 }
 
 func TestGetPubKey(t *testing.T) {
-	test, err := types.AccAddressFromBech32("cosmos12zhwz792d8zpxj3wmz05c7k9meea6q0xvf5y79")
+	test, err := types.AccAddressFromBech32("cosmos1se08culg909jlx0tzusfy320ujf25d6f9690ql")
 	assert.NoError(t, err)
 	account, err := client.QueryAccount(test)
 	assert.NoError(t, err)
@@ -97,7 +98,7 @@ func TestGetPubKey(t *testing.T) {
 func TestGetEvents(t *testing.T) {
 	events, err := client.GetEvents(
 		[]string{
-			"transfer.recipient='cosmos198x9u86eent8z7f6kvyzujzl27w7h6ladvwksh'",
+			"transfer.recipient='cosmos19zfpgad0sup6d65hcs9aug7jzq3fe2d89tqvmr'",
 			"message.module='bank'"},
 		1, 40, "asc")
 	if err != nil {

@@ -78,7 +78,6 @@ func SyncEthTx(db *db.WrapDb, ethEndpoint, apiKey string) error {
 }
 
 func GetEthTxs(url string) (*ResEtherScan, error) {
-
 	var res *http.Response
 	var err error
 	retry := 0

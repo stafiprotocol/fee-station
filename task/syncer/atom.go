@@ -64,8 +64,17 @@ func SyncAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 		if err != nil {
 			return err
 		}
-
+		txResPre, err := client.GetEvents(filter, int(1), pageLimit, "asc")
+		if err != nil {
+			return err
+		}
 		usePage := totalCount/int64(pageLimit) + 1
+
+		//sip if localdb have
+		if uint64(usePage) > txResPre.PageTotal {
+			return nil
+		}
+
 		txRes, err := client.GetEvents(filter, int(usePage), pageLimit, "asc")
 		if err != nil {
 			return err
@@ -88,8 +97,11 @@ func SyncAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 			senderAddr := ""
 			inAmount := ""
 			msgs := tx.GetTx().GetMsgs()
+
+		out:
 			for i, _ := range msgs {
-				if msgs[i].Type() == xBankTypes.TypeMsgSend {
+				switch msgs[i].Type() {
+				case xBankTypes.TypeMsgSend:
 					if sendMsg, ok := msgs[i].(*xBankTypes.MsgSend); ok {
 						toAddr, err := types.AccAddressFromBech32(sendMsg.ToAddress)
 						if err == nil {
@@ -97,12 +109,25 @@ func SyncAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 							if bytes.Equal(toAddr.Bytes(), poolAddr.Bytes()) {
 								inAmount = sendMsg.Amount.AmountOf(client.GetDenom()).String()
 								senderAddr = sendMsg.FromAddress
-								break
+								break out
+							}
+						}
+					}
+				case xBankTypes.TypeMsgMultiSend: //not support, will skip
+					if multiSendMsg, ok := msgs[i].(*xBankTypes.MsgMultiSend); ok {
+						for _, output := range multiSendMsg.Outputs {
+							toAddr, err := types.AccAddressFromBech32(output.Address)
+							if err == nil {
+								//amount and pool address must in one message
+								if bytes.Equal(toAddr.Bytes(), poolAddr.Bytes()) {
+									inAmount = output.Coins.AmountOf(client.GetDenom()).String()
+									senderAddr = multiSendMsg.Inputs[0].Address
+									break out
+								}
 							}
 						}
 
 					}
-
 				}
 			}
 
@@ -124,14 +149,20 @@ func SyncAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 				return err
 			}
 
+			usePubkey := strings.ToLower(hexutil.Encode(accountRes.GetPubKey().Bytes()))
+			txStatus := int64(0)
+			if tx.Code != 0 {
+				txStatus = int64(tx.Code)
+			}
+
 			nativeTx := dao_station.FeeStationNativeChainTx{
 				State:        0,
-				TxStatus:     int64(tx.Code),
+				TxStatus:     txStatus,
 				Symbol:       utils.SymbolAtom,
 				Blockhash:    strings.ToLower(hexutil.Encode(resBlock.BlockID.Hash.Bytes())),
 				Txhash:       useTxHash,
 				PoolAddress:  poolAddress,
-				SenderPubkey: strings.ToLower(hexutil.Encode(accountRes.GetPubKey().Bytes())),
+				SenderPubkey: usePubkey,
 				InAmount:     inAmount,
 				TxTimestamp:  txTimestamp.Unix(),
 			}
