@@ -1,4 +1,4 @@
-# api doc
+# API doc
 
 
 ## 0. status code
