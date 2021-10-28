@@ -23,6 +23,10 @@ type FeeStationSwapInfo struct {
 	BundleAddressId int64  `gorm:"not null;default:0;column:bundle_address_id"`
 }
 
+func (f FeeStationSwapInfo) TableName() string {
+	return "swap_infos"
+}
+
 func UpOrInFeeStationSwapInfo(db *db.WrapDb, c *FeeStationSwapInfo) error {
 	return db.Save(c).Error
 }

@@ -20,6 +20,7 @@ import (
 
 var substrateTxPath = "/api/scan/transfers"
 var substrateBlockPath = "/api/scan/block"
+var substratePageLimit = 100
 
 func SyncDotTx(db *db.WrapDb, dotEndpoint, apiKey string) error {
 	poolAddressRes, err := dao_station.GetFeeStationPoolAddressBySymbol(db, utils.SymbolDot)
@@ -30,7 +31,7 @@ func SyncDotTx(db *db.WrapDb, dotEndpoint, apiKey string) error {
 
 	usePage := 1
 	useUrl := dotEndpoint + substrateTxPath
-	txs, err := GetSubstrateTxs(useUrl, poolAddress, apiKey, int(usePage), pageLimit)
+	txs, err := GetSubstrateTxs(useUrl, poolAddress, apiKey, int(usePage), substratePageLimit)
 	if err != nil {
 		return err
 	}
@@ -40,11 +41,14 @@ func SyncDotTx(db *db.WrapDb, dotEndpoint, apiKey string) error {
 		return nil
 	}
 
-	pageMax := txs.Data.Count/pageLimit + 1
+	pageMax := txs.Data.Count/substratePageLimit + 1
+	if pageMax > 2 {
+		pageMax = 2
+	}
 
 	for i := 1; i <= pageMax; i++ {
-		time.Sleep(6 * time.Second)
-		txs, err := GetSubstrateTxs(useUrl, poolAddress, apiKey, i, pageLimit)
+		time.Sleep(10 * time.Second)
+		txs, err := GetSubstrateTxs(useUrl, poolAddress, apiKey, i, substratePageLimit)
 		if err != nil {
 			return err
 		}
@@ -74,7 +78,7 @@ func SyncDotTx(db *db.WrapDb, dotEndpoint, apiKey string) error {
 			if err != nil {
 				return err
 			}
-			time.Sleep(6 * time.Second)
+			time.Sleep(10 * time.Second)
 			resBlock, err := GetSubstrateBlock(dotEndpoint+substrateBlockPath, apiKey, tx.BlockNum)
 			if err != nil {
 				return fmt.Errorf("GetSubstrateBlock failed: %s", err)

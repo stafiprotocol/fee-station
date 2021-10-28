@@ -9,6 +9,10 @@ type FeeStationTokenPrice struct {
 	Price  string `gorm:"type:varchar(30);not null;default:'0';column:price"` //decimals 18
 }
 
+func (f FeeStationTokenPrice) TableName() string {
+	return "token_prices"
+}
+
 func UpOrInFeeStationTokenPrice(db *db.WrapDb, c *FeeStationTokenPrice) error {
 	return db.Save(c).Error
 }

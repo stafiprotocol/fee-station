@@ -8,6 +8,10 @@ type FeeStationPoolAddress struct {
 	PoolAddress string `gorm:"type:varchar(80);not null;default:'';column:pool_address"`
 }
 
+func (f FeeStationPoolAddress) TableName() string {
+	return "pool_addresses"
+}
+
 func UpOrInFeeStationPoolAddress(db *db.WrapDb, c *FeeStationPoolAddress) error {
 	return db.Save(c).Error
 }
