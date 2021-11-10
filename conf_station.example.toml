@@ -6,10 +6,10 @@ swapMinLimit = "1000000000000" #decimals 12
 swapRate = "1600000" #decimals 6
 
 [poolAddress]
-atom = "cosmos1yrdmg324z7lrrr3y0ruczuh459n9l6vgdn8tkn"
-dot = "33e2iTrJ3HDJz3wpdcfa6ooipT6xfMCvpLxkpFaJwkyCvRGM"
+atom = "cosmos1h6334dxdr3p0rccqhhpr057hevwrhk37qm6zsx"
+dot = "13frq3FZeKV8Zzzq68AEbjoDoiAr7iWYerxcG7NTBpwQ68gF"
 eth = "0x99c85bb64564d9ef9a99621301f22c9993cb89e3"
-ksm = "33e2iTrJ3HDJz3wpdcfa6ooipT6xfMCvpLxkpFaJwkyCvRGM"
+ksm = "FFBM2LNQuEat7okuBvHMYL56gTSE5mb2k4sVUf47Y8Nem1d"
 
 [db]
 host = "127.0.0.1" # mysql host ip

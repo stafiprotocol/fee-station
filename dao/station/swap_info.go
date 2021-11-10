@@ -6,7 +6,7 @@ import "fee-station/pkg/db"
 type FeeStationSwapInfo struct {
 	db.BaseModel
 	StafiAddress    string `gorm:"type:varchar(80);not null;default:'0x';column:stafi_address"` //hex
-	State           uint8  `gorm:"type:tinyint(1);unsigned;not null;default:0;column:state"`    //0 verify sigs 1 verify tx ok 2 verify tx failed 3 swap ok
+	State           uint8  `gorm:"type:tinyint(1);unsigned;not null;default:0;column:state"`
 	Symbol          string `gorm:"type:varchar(10);not null;default:'symbol';column:symbol"`
 	Blockhash       string `gorm:"type:varchar(80);not null;default:'0x';column:block_hash"`
 	Txhash          string `gorm:"type:varchar(80);not null;default:'0x';column:tx_hash;uniqueIndex:uni_idx_tx"`

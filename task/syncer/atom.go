@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/JFJun/go-substrate-crypto/ss58"
 	"github.com/cosmos/cosmos-sdk/types"
 	xBankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -148,6 +149,22 @@ func SyncAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 			if err != nil {
 				return err
 			}
+			//got receiver
+			var receiver string
+			var memoInTx string
+			txx, err := client.GetTxConfig().TxDecoder()(tx.Tx.GetValue())
+			if err == nil {
+				memoTx, ok := txx.(types.TxWithMemo)
+				if ok {
+					memoInTx = memoTx.GetMemo()
+				}
+			}
+			if len(memoInTx) != 0 {
+				receiverBts, err := ss58.DecodeToPub(memoInTx)
+				if err == nil {
+					receiver = strings.ToLower(hexutil.Encode(receiverBts))
+				}
+			}
 
 			usePubkey := strings.ToLower(hexutil.Encode(accountRes.GetPubKey().Bytes()))
 			txStatus := int64(0)
@@ -165,6 +182,7 @@ func SyncAtomTx(db *db.WrapDb, denom, atomEndpoint string) error {
 				SenderPubkey: usePubkey,
 				InAmount:     inAmount,
 				TxTimestamp:  txTimestamp.Unix(),
+				Receiver:     receiver,
 			}
 
 			err = dao_station.UpOrInFeeStationNativeChainTx(db, &nativeTx)
